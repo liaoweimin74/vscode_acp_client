@@ -1,0 +1,216 @@
+:root {
+	--acp-bg: var(--vscode-editor-background);
+	--acp-fg: var(--vscode-editor-foreground);
+	--acp-muted: var(--vscode-descriptionForeground);
+	--acp-accent: var(--vscode-button-background);
+	--acp-accent-fg: var(--vscode-button-foreground);
+	--acp-border: var(--vscode-panel-border);
+	--acp-input-bg: var(--vscode-input-background);
+	--acp-input-border: var(--vscode-input-border);
+	--acp-input-fg: var(--vscode-input-foreground);
+	--acp-list-hover: var(--vscode-list-hoverBackground);
+	--acp-list-active: var(--vscode-list-activeSelectionBackground);
+	--acp-list-active-fg: var(--vscode-list-activeSelectionForeground);
+	--acp-scrollbar: var(--vscode-scrollbarSlider-background);
+	--acp-scrollbar-hover: var(--vscode-scrollbarSlider-hoverBackground);
+	--acp-error: var(--vscode-errorForeground);
+	--acp-success: var(--vscode-terminal-ansiGreen);
+	--acp-warning: var(--vscode-terminal-ansiYellow);
+	--acp-radius: 4px;
+	--acp-radius-lg: 8px;
+	--acp-font-mono: var(--vscode-editor-font-family, "Cascadia Code", "Fira Code", Menlo, Monaco, Consolas, monospace);
+	--acp-font-sans: var(--vscode-font-family, system-ui, -apple-system, sans-serif);
+	--acp-font-size: var(--vscode-font-size, 13px);
+	--acp-spacing-xs: 4px;
+	--acp-spacing-sm: 8px;
+	--acp-spacing-md: 12px;
+	--acp-spacing-lg: 16px;
+	--acp-spacing-xl: 24px;
+	--acp-transition: 150ms ease;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+html,
+body,
+#root {
+	height: 100%;
+	overflow: hidden;
+}
+
+body {
+	font-family: var(--acp-font-sans);
+	font-size: var(--acp-font-size);
+	color: var(--acp-fg);
+	background: var(--acp-bg);
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+	width: 8px;
+}
+
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--acp-scrollbar);
+	border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: var(--acp-scrollbar-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		transition-duration: 0.01ms !important;
+	}
+}
+
+.acp-app {
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+}
+
+.acp-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: var(--acp-spacing-sm) var(--acp-spacing-md);
+	border-bottom: 1px solid var(--acp-border);
+	flex-shrink: 0;
+	gap: var(--acp-spacing-sm);
+	min-height: 36px;
+}
+
+.acp-header__agent {
+	display: flex;
+	align-items: center;
+	gap: var(--acp-spacing-xs);
+	min-width: 0;
+}
+
+.acp-header__status {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	flex-shrink: 0;
+}
+
+.acp-header__status--connected {
+	background: var(--acp-success);
+}
+
+.acp-header__status--disconnected {
+	background: var(--acp-muted);
+}
+
+.acp-header__status--error {
+	background: var(--acp-error);
+}
+
+.acp-header__name {
+	font-weight: 600;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.acp-header__name--empty {
+	color: var(--acp-muted);
+	font-weight: 400;
+	font-style: italic;
+}
+
+.acp-header__config {
+	display: flex;
+	align-items: center;
+	gap: var(--acp-spacing-xs);
+	flex-shrink: 0;
+}
+
+.acp-content {
+	flex: 1;
+	overflow-y: auto;
+	min-height: 0;
+}
+
+.acp-content__empty {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	color: var(--acp-muted);
+	text-align: center;
+	padding: var(--acp-spacing-xl);
+}
+
+.acp-footer {
+	flex-shrink: 0;
+	border-top: 1px solid var(--acp-border);
+	padding: var(--acp-spacing-sm) var(--acp-spacing-md);
+}
+
+.acp-sessions-panel {
+	border-bottom: 1px solid var(--acp-border);
+	max-height: 200px;
+	overflow-y: auto;
+	flex-shrink: 0;
+}
+
+.acp-header__right {
+	position: relative;
+	display: flex;
+	align-items: center;
+}
+
+.acp-session-btn {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 2px 6px;
+	border: 1px solid var(--acp-border);
+	border-radius: var(--acp-radius);
+	background: transparent;
+	cursor: pointer;
+	transition: background var(--acp-transition);
+}
+
+.acp-session-btn:hover {
+	background: var(--acp-list-hover);
+}
+
+.acp-session-btn__label {
+	max-width: 100px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-size: 0.85em;
+	color: var(--acp-muted);
+}
+
+.acp-session-dropdown {
+	position: absolute;
+	top: 100%;
+	right: 0;
+	margin-top: 4px;
+	min-width: 220px;
+	border: 1px solid var(--acp-border);
+	border-radius: var(--acp-radius);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	z-index: 100;
+	overflow: hidden;
+}

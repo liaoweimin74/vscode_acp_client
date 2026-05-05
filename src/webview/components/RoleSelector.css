@@ -1,0 +1,60 @@
+.acp-role-selector {
+	position: relative;
+}
+
+.acp-role-selector__btn {
+	display: flex;
+	align-items: center;
+	gap: var(--acp-spacing-xs);
+	padding: var(--acp-spacing-xs) var(--acp-spacing-sm);
+	border: 1px solid var(--acp-border);
+	border-radius: var(--acp-radius);
+	background: var(--acp-bg);
+	color: var(--acp-fg);
+	font-family: inherit;
+	font-size: 0.9em;
+	cursor: pointer;
+	transition: background var(--acp-transition);
+	white-space: nowrap;
+}
+
+.acp-role-selector__btn:hover {
+	background: var(--acp-list-hover);
+}
+
+.acp-role-selector__menu {
+	position: absolute;
+	bottom: 100%;
+	left: 0;
+	margin-bottom: 4px;
+	min-width: 140px;
+	background: var(--acp-bg);
+	border: 1px solid var(--acp-border);
+	border-radius: var(--acp-radius);
+	box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+	z-index: 100;
+	overflow: hidden;
+}
+
+.acp-role-selector__item {
+	display: block;
+	width: 100%;
+	padding: var(--acp-spacing-sm) var(--acp-spacing-md);
+	border: none;
+	background: transparent;
+	color: var(--acp-fg);
+	font-family: inherit;
+	font-size: 0.9em;
+	text-align: left;
+	cursor: pointer;
+	transition: background var(--acp-transition);
+}
+
+.acp-role-selector__item:hover {
+	background: var(--acp-list-hover);
+}
+
+.acp-role-selector__item.is-active {
+	color: var(--acp-warning);
+	font-weight: 600;
+}

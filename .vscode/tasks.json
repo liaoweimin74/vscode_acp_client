@@ -1,0 +1,21 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "build:dev",
+      "problemMatcher": "$tsc",
+      "isBackground": false,
+      "label": "npm: build:dev",
+      "detail": "Build extension with sourcemaps for debugging"
+    },
+    {
+      "type": "npm",
+      "script": "build",
+      "problemMatcher": "$tsc",
+      "isBackground": false,
+      "label": "npm: build",
+      "detail": "Build extension for production"
+    }
+  ]
+}

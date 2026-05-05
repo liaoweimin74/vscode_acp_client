@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>ACP Agent - Test</title>
+	<style>
+		:root {
+			--vscode-editor-background: #1e1e1e;
+			--vscode-editor-foreground: #d4d4d4;
+			--vscode-descriptionForeground: #8b8b8b;
+			--vscode-button-background: #0e639c;
+			--vscode-button-foreground: #fff;
+			--vscode-panel-border: #474747;
+			--vscode-input-background: #3c3c3c;
+			--vscode-input-border: #3c3c3c;
+			--vscode-input-foreground: #cccccc;
+			--vscode-list-hoverBackground: #2a2d2e;
+			--vscode-list-activeSelectionBackground: #094771;
+			--vscode-list-activeSelectionForeground: #fff;
+			--vscode-scrollbarSlider-background: #42424280;
+			--vscode-scrollbarSlider-hoverBackground: #424242b3;
+			--vscode-errorForeground: #f14c4c;
+			--vscode-terminal-ansiGreen: #4ec9b0;
+			--vscode-terminal-ansiYellow: #d7ba7d;
+			--vscode-font-family: system-ui, -apple-system, sans-serif;
+			--vscode-editor-font-family: "Cascadia Code", "Fira Code", Menlo, Monaco, Consolas, monospace;
+			--vscode-font-size: 13px;
+		}
+	</style>
+	<script>
+		window.__mockMessages = [];
+		window.__mockState = undefined;
+		window.acquireVsCodeApi = function() {
+			return {
+				postMessage(msg) {
+					window.__mockMessages.push(msg);
+					window.dispatchEvent(new CustomEvent('vscode-postMessage', { detail: msg }));
+				},
+				getState() {
+					return window.__mockState;
+				},
+				setState(state) {
+					window.__mockState = state;
+				}
+			};
+		};
+	</script>
+</head>
+<body>
+	<div id="root"></div>
+	<script type="module" src="./index.tsx"></script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+.acp-sub-agent {
+	border: 1px solid var(--acp-border);
+	border-radius: var(--acp-radius);
+	overflow: hidden;
+	margin-top: var(--acp-spacing-xs);
+}
+
+.acp-sub-agent__toggle {
+	display: flex;
+	align-items: center;
+	gap: var(--acp-spacing-xs);
+	padding: var(--acp-spacing-xs) var(--acp-spacing-sm);
+	border: none;
+	border-radius: var(--acp-radius);
+	background: transparent;
+	color: var(--acp-fg);
+	font-family: inherit;
+	font-size: 0.85em;
+	cursor: pointer;
+	width: 100%;
+	text-align: left;
+	transition: background var(--acp-transition);
+}
+
+.acp-sub-agent__toggle:hover {
+	background: var(--acp-list-hover);
+}
+
+.acp-sub-agent__chevron {
+	flex-shrink: 0;
+	transition: transform var(--acp-transition);
+}
+
+.acp-sub-agent--expanded .acp-sub-agent__chevron {
+	transform: rotate(90deg);
+}
+
+.acp-sub-agent__icon {
+	flex-shrink: 0;
+	color: var(--acp-warning);
+}
+
+.acp-sub-agent__label {
+	font-family: var(--acp-font-mono);
+	font-size: 0.9em;
+}
+
+.acp-sub-agent__summary {
+	font-size: 0.8em;
+	color: var(--acp-muted);
+	margin-left: auto;
+}
+
+.acp-sub-agent__content {
+	border-top: 1px solid var(--acp-border);
+	padding: var(--acp-spacing-sm);
+	font-size: 0.85em;
+	display: flex;
+	flex-direction: column;
+	gap: var(--acp-spacing-xs);
+}
+
+.acp-sub-agent__msg {
+	padding: var(--acp-spacing-xs);
+	border-radius: var(--acp-radius);
+	background: var(--acp-list-hover);
+}
+
+.acp-sub-agent__msg--user {
+	border-left: 2px solid var(--acp-fg);
+}
+
+.acp-sub-agent__msg--assistant {
+	border-left: 2px solid var(--acp-warning);
+}
+
+.acp-sub-agent__msg-header {
+	display: flex;
+	align-items: center;
+	gap: var(--acp-spacing-xs);
+	margin-bottom: 2px;
+}
+
+.acp-sub-agent__msg-role {
+	font-weight: 600;
+	font-size: 0.85em;
+}
+
+.acp-sub-agent__msg-time {
+	font-size: 0.8em;
+	color: var(--acp-muted);
+}
+
+.acp-sub-agent__msg-content {
+	white-space: pre-wrap;
+	word-break: break-word;
+	line-height: 1.4;
+}
+
+.acp-sub-agent__inline-code {
+	background: var(--acp-list-hover);
+	padding: 0.1em 0.3em;
+	border-radius: 3px;
+	font-family: var(--acp-font-mono);
+	font-size: 0.9em;
+}
+
+.acp-sub-agent__tools {
+	display: flex;
+	flex-direction: column;
+	gap: var(--acp-spacing-xs);
+	margin-top: var(--acp-spacing-xs);
+}
+
+.acp-sub-agent__nested {
+	margin-top: var(--acp-spacing-xs);
+	margin-left: var(--acp-spacing-sm);
+	display: flex;
+	flex-direction: column;
+	gap: var(--acp-spacing-xs);
+}

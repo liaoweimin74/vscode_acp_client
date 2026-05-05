@@ -1,0 +1,124 @@
+.acp-config-bar {
+	display: flex;
+	align-items: center;
+	gap: var(--acp-spacing-xs);
+}
+
+.acp-config-bar__dropdown {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 2px;
+}
+
+.acp-config-bar__btn {
+	display: flex;
+	align-items: center;
+	gap: 3px;
+	padding: 2px var(--acp-spacing-xs);
+	border: 1px solid var(--acp-border);
+	border-radius: var(--acp-radius);
+	background: transparent;
+	color: var(--acp-muted);
+	font-family: inherit;
+	font-size: 0.85em;
+	cursor: pointer;
+	transition: background var(--acp-transition), color var(--acp-transition);
+}
+
+.acp-config-bar__btn:hover {
+	background: var(--acp-list-hover);
+	color: var(--acp-fg);
+}
+
+.acp-config-bar__level-select-wrap {
+	display: flex;
+	align-items: center;
+}
+
+.acp-config-bar__level-trigger {
+	appearance: none;
+	padding: 2px 18px 2px 6px;
+	border: 1px solid var(--acp-border);
+	border-radius: var(--acp-radius);
+	background: var(--acp-bg);
+	color: var(--acp-muted);
+	font-family: inherit;
+	font-size: 0.8em;
+	cursor: pointer;
+	transition: background var(--acp-transition), color var(--acp-transition);
+	background-image: url("data:image/svg+xml,%3Csvg width='8' height='5' viewBox='0 0 8 5' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L4 4L7 1' stroke='%23888' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 5px center;
+	background-size: 8px 5px;
+}
+
+.acp-config-bar__level-trigger:hover {
+	background-color: var(--acp-list-hover);
+	color: var(--acp-fg);
+}
+
+.acp-config-bar__menu {
+	position: absolute;
+	bottom: 100%;
+	left: 0;
+	margin-bottom: 4px;
+	min-width: 150px;
+	max-width: 250px;
+	max-height: 300px;
+	overflow-y: auto;
+	background: var(--acp-bg);
+	border: 1px solid var(--acp-border);
+	border-radius: var(--acp-radius);
+	box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+	z-index: 100;
+}
+
+.acp-config-bar__menu-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	padding: 6px 12px;
+	border: none;
+	background: transparent;
+	color: var(--acp-fg);
+	font-family: inherit;
+	font-size: 0.85em;
+	text-align: left;
+	cursor: pointer;
+	transition: background var(--acp-transition);
+}
+
+.acp-config-bar__menu-item:hover {
+	background: var(--acp-list-hover);
+}
+
+.acp-config-bar__menu-item.is-active {
+	background: var(--acp-accent);
+	color: var(--acp-bg);
+}
+
+.acp-config-bar__menu-item-count {
+	font-size: 0.8em;
+	opacity: 0.6;
+	margin-left: 8px;
+}
+
+.acp-config-bar__attach-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 2px;
+	border: 1px solid var(--acp-border);
+	border-radius: var(--acp-radius);
+	background: transparent;
+	color: var(--acp-muted);
+	cursor: pointer;
+	transition: background var(--acp-transition), color var(--acp-transition);
+}
+
+.acp-config-bar__attach-btn:hover {
+	background: var(--acp-list-hover);
+	color: var(--acp-fg);
+}

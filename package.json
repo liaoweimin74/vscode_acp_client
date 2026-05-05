@@ -1,0 +1,254 @@
+{
+  "name": "vscode-acp",
+  "displayName": "VSACP",
+  "description": "Connect AI coding CLIs via ACP protocol. Switch models, agents, view sub-agent context, manage sessions.",
+  "version": "0.1.0",
+  "publisher": "hexuya",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Chat",
+    "Programming Languages",
+    "Machine Learning"
+  ],
+  "keywords": [
+    "ai",
+    "agent",
+    "acp",
+    "opencode",
+    "chat"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "vscodeAcp",
+          "title": "ACP Agent",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "vscodeAcp": [
+        {
+          "type": "webview",
+          "id": "vscodeAcp.sidebar",
+          "name": "Agent Chat"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "vscodeAcp.selectAgent",
+        "title": "ACP: Select Agent",
+        "category": "ACP"
+      },
+      {
+        "command": "vscodeAcp.newSession",
+        "title": "ACP: New Session",
+        "category": "ACP"
+      },
+      {
+        "command": "vscodeAcp.switchSession",
+        "title": "ACP: Switch Session",
+        "category": "ACP"
+      },
+      {
+        "command": "vscodeAcp.selectModel",
+        "title": "ACP: Select Model",
+        "category": "ACP"
+      },
+      {
+        "command": "vscodeAcp.setThoughtLevel",
+        "title": "ACP: Set Thought Level",
+        "category": "ACP"
+      },
+      {
+        "command": "vscodeAcp.openSettings",
+        "title": "ACP: Open Settings",
+        "category": "ACP"
+      },
+      {
+        "command": "vscodeAcp.discoverAgents",
+        "title": "ACP: Discover Agents",
+        "category": "ACP"
+      },
+      {
+        "command": "vscodeAcp.selectAgentRole",
+        "title": "ACP: Select Agent Role",
+        "category": "ACP"
+      }
+    ],
+    "keybindings": [
+      {
+        "key": "ctrl+tab",
+        "command": "vscodeAcp.selectAgentRole",
+        "when": "activeWebviewViewId == vscodeAcp.sidebar"
+      }
+    ],
+    "configuration": {
+      "title": "VS ACP Client",
+      "properties": {
+        "vscodeAcp.agents": {
+          "type": "array",
+          "default": [],
+          "description": "List of ACP-compatible agent configurations",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Unique identifier for the agent"
+              },
+              "name": {
+                "type": "string",
+                "description": "Display name"
+              },
+              "command": {
+                "type": "string",
+                "description": "CLI command to start the agent (e.g., 'opencode')"
+              },
+              "args": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Command arguments"
+              },
+              "env": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "Environment variables"
+              },
+              "cachedModels": {
+                "type": "array",
+                "description": "Cached model list from last session",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "cachedRoles": {
+                "type": "array",
+                "description": "Cached role list from last session",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "command"
+            ]
+          }
+        },
+        "vscodeAcp.defaultAgent": {
+          "type": "string",
+          "default": "",
+          "description": "Default agent ID to use on startup"
+        },
+        "vscodeAcp.theme": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "light",
+            "dark"
+          ],
+          "default": "auto",
+          "description": "UI theme (auto follows VSCode theme)"
+        },
+        "vscodeAcp.logLevel": {
+          "type": "string",
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ],
+          "default": "info",
+          "description": "Log level for the ACP Agent output channel"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.config.js --production",
+    "build:dev": "node esbuild.config.js && vite build --config src/webview/vite.config.ts",
+    "build:webview": "vite build --config src/webview/vite.config.ts",
+    "build:all": "npm run build && npm run build:webview",
+    "watch": "node esbuild.config.js --watch",
+    "watch:webview": "vite build --watch --config src/webview/vite.config.ts",
+    "lint": "biome check src/",
+    "lint:fix": "biome check --write src/",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:webview": "vitest run --config vitest.webview.config.ts",
+    "test:webview:watch": "vitest --config vitest.webview.config.ts",
+    "test:e2e": "npm run build:all && node dist/e2e/runTests.js",
+    "test:e2e-ui": "playwright test --config playwright.config.ts",
+    "package": "npm run build:all && vsce package",
+    "pretest": "npm run build"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.0",
+    "@playwright/test": "^1.59.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^25.6.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "@types/vscode": "^1.85.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2",
+    "esbuild": "^0.24.0",
+    "jsdom": "^27.0.1",
+    "mocha": "^11.7.5",
+    "typescript": "^5.6.0",
+    "vite": "^6.0.0",
+    "vitest": "^2.1.0"
+  },
+  "dependencies": {
+    "@agentclientprotocol/sdk": "^0.20.0",
+    "@typespec/compiler": "^1.11.0",
+    "highlight.js": "^11.11.1",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "use-sync-external-store": "^1.6.0",
+    "zustand": "^5.0.12"
+  }
+}

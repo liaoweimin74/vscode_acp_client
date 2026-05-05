@@ -1,0 +1,50 @@
+.acp-slash-menu {
+	position: absolute;
+	bottom: 100%;
+	left: 0;
+	right: 0;
+	max-height: 200px;
+	overflow-y: auto;
+	background: var(--acp-bg);
+	border: 1px solid var(--acp-border);
+	border-radius: var(--acp-radius);
+	box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+	z-index: 10;
+}
+
+.acp-slash-menu__item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--acp-spacing-sm);
+	padding: var(--acp-spacing-xs) var(--acp-spacing-sm);
+	border: none;
+	border-radius: 2px;
+	background: transparent;
+	color: var(--acp-fg);
+	font-family: inherit;
+	font-size: inherit;
+	cursor: pointer;
+	width: 100%;
+	text-align: left;
+	transition: background var(--acp-transition);
+}
+
+.acp-slash-menu__item:hover,
+.acp-slash-menu__item--active {
+	background: var(--acp-list-hover);
+}
+
+.acp-slash-menu__name {
+	font-family: var(--acp-font-mono);
+	font-weight: 600;
+	flex-shrink: 0;
+}
+
+.acp-slash-menu__desc {
+	color: var(--acp-muted);
+	font-size: 0.85em;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}

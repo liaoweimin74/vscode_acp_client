@@ -1,0 +1,54 @@
+.acp-code-block {
+	border: 1px solid var(--acp-border);
+	border-radius: var(--acp-radius);
+	overflow: hidden;
+	margin: var(--acp-spacing-xs) 0;
+}
+
+.acp-code-block__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 2px var(--acp-spacing-sm);
+	background: var(--acp-border);
+	font-size: 0.8em;
+}
+
+.acp-code-block__lang {
+	color: var(--acp-muted);
+	text-transform: uppercase;
+	font-size: 0.85em;
+	letter-spacing: 0.5px;
+}
+
+.acp-code-block__copy {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 2px;
+	border: none;
+	border-radius: 2px;
+	background: transparent;
+	color: var(--acp-muted);
+	cursor: pointer;
+	transition: background var(--acp-transition), color var(--acp-transition);
+}
+
+.acp-code-block__copy:hover {
+	background: var(--acp-list-hover);
+	color: var(--acp-fg);
+}
+
+.acp-code-block__pre {
+	margin: 0;
+	padding: var(--acp-spacing-sm);
+	overflow-x: auto;
+	font-family: var(--acp-font-mono);
+	font-size: 0.9em;
+	line-height: 1.5;
+	tab-size: 2;
+}
+
+.acp-code-block__code {
+	white-space: pre;
+}
