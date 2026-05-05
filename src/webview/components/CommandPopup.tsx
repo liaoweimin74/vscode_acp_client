@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useStore } from "../store";
 import { selCommandPopup, selCloseCommandPopup, selOpenSessionMenu, selSetConfig, selConfigOptions } from "../store/selectors";
 import { ModelSelector } from "./ModelSelector";
+import { t } from "../i18n";
 import "./CommandPopup.css";
 
 export function CommandPopup() {
@@ -53,7 +54,7 @@ export function CommandPopup() {
 						onClose={closeCommandPopup}
 					/>
 					) : (
-						<div className="acp-popup__empty">Model selection not available</div>
+						<div className="acp-popup__empty">{t("model.notAvailable")}</div>
 					)}
 				</div>
 			</div>

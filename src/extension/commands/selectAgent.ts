@@ -7,20 +7,20 @@ export function registerSelectAgent(ctx: CommandContext): vscode.Disposable {
 		const agents = ctx.registry.getAll();
 
 		if (agents.length === 0) {
-			vscode.window.showWarningMessage("No agents configured. Add agents in settings.");
+			vscode.window.showWarningMessage(vscode.l10n.t("No agents configured. Add agents in settings."));
 			return;
 		}
 
 		const items = agents.map((conn) => ({
 			label: conn.config.name,
 			description: conn.config.id,
-			detail: conn.isConnected ? "$(check) Connected" : "$(circle-slash) Disconnected",
+			detail: conn.isConnected ? `$(check) ${vscode.l10n.t("Connected")}` : `$(circle-slash) ${vscode.l10n.t("Disconnected")}`,
 			agentId: conn.config.id,
 		}));
 
 		const picked = await vscode.window.showQuickPick(items, {
-			placeHolder: "Select an agent",
-			title: "ACP: Select Agent",
+			placeHolder: vscode.l10n.t("Select an agent"),
+			title: vscode.l10n.t("ACP: Select Agent"),
 		});
 
 		if (picked) {
@@ -34,7 +34,7 @@ export function registerSelectAgent(ctx: CommandContext): vscode.Disposable {
 					await vscode.window.withProgress(
 						{
 							location: vscode.ProgressLocation.Window,
-							title: `Connecting to ${picked.label}...`,
+							title: vscode.l10n.t("Connecting to {0}...", picked.label),
 							cancellable: false,
 						},
 						async () => {
@@ -49,7 +49,7 @@ export function registerSelectAgent(ctx: CommandContext): vscode.Disposable {
 					ctx.state.setActiveSession(null);
 					ctx.state.setConfigOptions([]);
 					vscode.window.showErrorMessage(
-						`Failed to connect: ${errorMsg}`,
+						vscode.l10n.t("Failed to connect: {0}", errorMsg),
 					);
 					return;
 				}

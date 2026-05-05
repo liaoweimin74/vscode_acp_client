@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { PromptInput } from "../../src/webview/components/PromptInput";
 import { useStore } from "../../src/webview/store";
 import * as vscodeApi from "../../src/webview/api/vscode";
+import { t } from "../../src/webview/i18n";
 
 vi.mock("../../src/webview/api/vscode", () => ({
 	postMessage: vi.fn(),
@@ -11,11 +12,14 @@ vi.mock("../../src/webview/api/vscode", () => ({
 	setVsCodeState: vi.fn(),
 }));
 
+const connectedAgent = { config: { id: "opencode", name: "OpenCode", command: "opencode" }, status: "connected" };
+
 describe("PromptInput", () => {
 	beforeEach(() => {
 		useStore.setState({
 			activeAgent: "opencode",
 			activeSession: "ses_1",
+			agents: [connectedAgent],
 			inputText: "",
 			isStreaming: false,
 			isCommandMenuOpen: false,
@@ -31,24 +35,24 @@ describe("PromptInput", () => {
 
 	it("renders textarea with placeholder when session active", () => {
 		render(<PromptInput />);
-		expect(screen.getByPlaceholderText("Type a message... (/ for commands, @ for roles & files)")).toBeInTheDocument();
+		expect(screen.getByPlaceholderText(t("prompt.placeholder.connected"))).toBeInTheDocument();
 	});
 
 	it("renders enabled textarea when no session but agent connected", () => {
 		useStore.setState({ activeSession: null });
 		render(<PromptInput />);
-		expect(screen.getByPlaceholderText("Type a message... (/ for commands, @ for roles & files)")).not.toBeDisabled();
+		expect(screen.getByPlaceholderText(t("prompt.placeholder.connected"))).not.toBeDisabled();
 	});
 
 	it("renders disabled textarea with agent placeholder when no agent", () => {
-		useStore.setState({ activeAgent: null, activeSession: null });
+		useStore.setState({ activeAgent: null, activeSession: null, agents: [] });
 		render(<PromptInput />);
-		expect(screen.getByPlaceholderText("Connect to an agent first")).toBeDisabled();
+		expect(screen.getByPlaceholderText(t("prompt.placeholder.disconnected"))).toBeDisabled();
 	});
 
 	it("opens command menu when typing /", () => {
 		render(<PromptInput />);
-		const textarea = screen.getByPlaceholderText("Type a message... (/ for commands, @ for roles & files)");
+		const textarea = screen.getByPlaceholderText(t("prompt.placeholder.connected"));
 		fireEvent.change(textarea, { target: { value: "/" } });
 		expect(useStore.getState().isCommandMenuOpen).toBe(true);
 	});
@@ -56,7 +60,7 @@ describe("PromptInput", () => {
 	it("closes command menu when typing non-slash input", () => {
 		useStore.setState({ isCommandMenuOpen: true });
 		render(<PromptInput />);
-		const textarea = screen.getByPlaceholderText("Type a message... (/ for commands, @ for roles & files)");
+		const textarea = screen.getByPlaceholderText(t("prompt.placeholder.connected"));
 		fireEvent.change(textarea, { target: { value: "hello" } });
 		expect(useStore.getState().isCommandMenuOpen).toBe(false);
 	});
@@ -83,20 +87,18 @@ describe("PromptInput", () => {
 
 	it("sends slash command via postMessage", () => {
 		render(<PromptInput />);
-		const textarea = screen.getByPlaceholderText("Type a message... (/ for commands, @ for roles & files)");
+		const textarea = screen.getByPlaceholderText(t("prompt.placeholder.connected"));
 		fireEvent.change(textarea, { target: { value: "/init" } });
 		fireEvent.keyDown(textarea, { key: "Enter" });
 		expect(vscodeApi.postMessage).toHaveBeenCalledWith({ type: "slash_command", command: "init", args: "" });
 	});
 
-	it("sends normal message and adds user message optimistically", () => {
+	it("sends normal message via postMessage", () => {
 		render(<PromptInput />);
-		const textarea = screen.getByPlaceholderText("Type a message... (/ for commands, @ for roles & files)");
+		const textarea = screen.getByPlaceholderText(t("prompt.placeholder.connected"));
 		fireEvent.change(textarea, { target: { value: "Hello" } });
 		fireEvent.keyDown(textarea, { key: "Enter" });
 		expect(vscodeApi.postMessage).toHaveBeenCalledWith({ type: "send_prompt", sessionId: "ses_1", prompt: "Hello" });
-		const messages = useStore.getState().messages.get("ses_1") ?? [];
-		expect(messages.some((m) => m.role === "user" && m.content === "Hello")).toBe(true);
 	});
 
 	it("shows connection error when present", () => {
@@ -108,7 +110,7 @@ describe("PromptInput", () => {
 	it("opens sessions popup instead of sending /sessions command", () => {
 		useStore.setState({ inputText: "/sessions" });
 		render(<PromptInput />);
-		const textarea = screen.getByPlaceholderText("Type a message... (/ for commands, @ for roles & files)");
+		const textarea = screen.getByPlaceholderText(t("prompt.placeholder.connected"));
 		fireEvent.keyDown(textarea, { key: "Enter" });
 		expect(vscodeApi.postMessage).not.toHaveBeenCalled();
 		expect(useStore.getState().commandPopup).toBe("sessions");
@@ -118,7 +120,7 @@ describe("PromptInput", () => {
 	it("opens models popup instead of sending /models command", () => {
 		useStore.setState({ inputText: "/models" });
 		render(<PromptInput />);
-		const textarea = screen.getByPlaceholderText("Type a message... (/ for commands, @ for roles & files)");
+		const textarea = screen.getByPlaceholderText(t("prompt.placeholder.connected"));
 		fireEvent.keyDown(textarea, { key: "Enter" });
 		expect(vscodeApi.postMessage).not.toHaveBeenCalled();
 		expect(useStore.getState().commandPopup).toBe("models");
@@ -128,6 +130,6 @@ describe("PromptInput", () => {
 	it("shows reconnect button when reconnectFailed", () => {
 		useStore.setState({ connectionError: "lost", reconnectFailed: true });
 		render(<PromptInput />);
-		expect(screen.getByText("Reconnect")).toBeInTheDocument();
+		expect(screen.getByText(t("prompt.reconnect"))).toBeInTheDocument();
 	});
 });

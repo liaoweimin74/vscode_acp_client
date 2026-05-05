@@ -9,6 +9,7 @@ import type {
 } from "@shared/types/extension";
 import { create } from "zustand";
 import { getVsCodeState, onMessage, postMessage, setVsCodeState } from "../api/vscode";
+import { setLocale } from "../i18n";
 
 interface UIState {
 	activeAgent: string | null;
@@ -34,6 +35,7 @@ interface UIState {
 	pastedSnippets: { id: string; preview: string; fullText: string; charCount: number }[];
 	mentionMenuOpen: boolean;
 	_cancelledStreamPending: boolean;
+	locale: string;
 
 	setState(state: ExtensionState): void;
 	setMessages(sessionId: string, messages: Message[]): void;
@@ -99,6 +101,8 @@ export const useStore = create<UIState>((set, get) => {
 					}
 					return incoming;
 				});
+				const localeUpdate = msg.state.locale ? { locale: msg.state.locale } : {};
+				if (msg.state.locale) setLocale(msg.state.locale);
 				set({
 					activeAgent: msg.state.activeAgent,
 					activeSession: newActiveSession,
@@ -108,6 +112,7 @@ export const useStore = create<UIState>((set, get) => {
 					connectionError: msg.state.connectionError ?? null,
 					agentRoles: incomingRoles,
 					activeRole: msg.state.activeRole ?? null,
+					...localeUpdate,
 				});
 				break;
 			}
@@ -249,6 +254,7 @@ export const useStore = create<UIState>((set, get) => {
 		pastedSnippets: [],
 		mentionMenuOpen: false,
 		_cancelledStreamPending: false,
+		locale: "en",
 
 		setState(state: ExtensionState) {
 			set({

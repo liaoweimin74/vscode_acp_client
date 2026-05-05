@@ -13,7 +13,7 @@ export function registerDiscoverAgents(ctx: CommandContext): vscode.Disposable {
 		await vscode.window.withProgress(
 			{
 				location: vscode.ProgressLocation.Window,
-				title: "Fetching agent registry...",
+				title: vscode.l10n.t("Fetching agent registry..."),
 				cancellable: false,
 			},
 			async () => {
@@ -28,15 +28,15 @@ export function registerDiscoverAgents(ctx: CommandContext): vscode.Disposable {
 							description: `v${agent.version}`,
 							detail: available
 								? `$(check) ${agent.description}`
-								: `$(circle-slash) Not available for ${platform}`,
+								: vscode.l10n.t("$(circle-slash) Not available for {0}", platform),
 							agent,
 							available,
 						};
 					});
 
 					const picked = await vscode.window.showQuickPick(items, {
-						placeHolder: "Select an agent to install",
-						title: "ACP: Discover Agents",
+						placeHolder: vscode.l10n.t("Select an agent to install"),
+						title: vscode.l10n.t("ACP: Discover Agents"),
 						matchOnDescription: true,
 						matchOnDetail: true,
 					});
@@ -45,12 +45,12 @@ export function registerDiscoverAgents(ctx: CommandContext): vscode.Disposable {
 						await installAgent(picked.agent, platform, registryService, ctx);
 					} else if (picked && !picked.available) {
 						vscode.window.showWarningMessage(
-							`${picked.label} is not available for your platform (${platform})`,
+							vscode.l10n.t("{0} is not available for your platform ({1})", picked.label, platform),
 						);
 					}
 				} catch (err) {
 					vscode.window.showErrorMessage(
-						`Failed to fetch registry: ${err instanceof Error ? err.message : String(err)}`,
+						vscode.l10n.t("Failed to fetch registry: {0}", err instanceof Error ? err.message : String(err)),
 					);
 				}
 			},
@@ -140,7 +140,7 @@ async function downloadAndExtractBinary(
 		: archiveUrl.endsWith(".tar.bz2") ? ".tar.bz2"
 		: ".zip";
 
-	progress.report({ message: `Downloading ${agent.name} v${agent.version}...` });
+	progress.report({ message: vscode.l10n.t("Downloading {0} v{1}...", agent.name, agent.version) });
 
 	const response = await fetch(archiveUrl);
 	if (!response.ok) {
@@ -151,7 +151,7 @@ async function downloadAndExtractBinary(
 	const buffer = Buffer.from(await response.arrayBuffer());
 	fs.writeFileSync(tmpFile, buffer);
 
-	progress.report({ message: `Extracting ${agent.name}...` });
+	progress.report({ message: vscode.l10n.t("Extracting {0}...", agent.name) });
 
 	await extractArchive(tmpFile, agentDir, archiveUrl);
 
@@ -176,17 +176,17 @@ async function installAgent(
 ): Promise<void> {
 	const cmdInfo = registryService.getAgentCommand(agent, platform);
 	if (!cmdInfo) {
-		vscode.window.showErrorMessage(`No installation method available for ${agent.name}`);
+		vscode.window.showErrorMessage(vscode.l10n.t("No installation method available for {0}", agent.name));
 		return;
 	}
 
 	const confirm = await vscode.window.showInformationMessage(
-		`Install ${agent.name} v${agent.version}?`,
+		vscode.l10n.t("Install {0} v{1}?", agent.name, agent.version),
 		{ modal: true, detail: agent.description },
-		"Install",
+		vscode.l10n.t("Install"),
 	);
 
-	if (confirm !== "Install") {
+	if (confirm !== vscode.l10n.t("Install")) {
 		return;
 	}
 
@@ -199,14 +199,14 @@ async function installAgent(
 			command = await vscode.window.withProgress(
 				{
 					location: vscode.ProgressLocation.Window,
-					title: `Installing ${agent.name}...`,
+					title: vscode.l10n.t("Installing {0}...", agent.name),
 					cancellable: false,
 				},
 				(progress) => downloadAndExtractBinary(agent, platform, ctx.context, progress),
 			);
 		} catch (err) {
 			const errorMsg = err instanceof Error ? err.message : String(err);
-			vscode.window.showErrorMessage(`Failed to install ${agent.name}: ${errorMsg}`);
+			vscode.window.showErrorMessage(vscode.l10n.t("Failed to install {0}: {1}", agent.name, errorMsg));
 			return;
 		}
 	}
@@ -217,11 +217,11 @@ async function installAgent(
 	const exists = agents.some((a) => a.id === agent.id);
 	if (exists) {
 		const overwrite = await vscode.window.showWarningMessage(
-			`${agent.name} is already configured. Overwrite?`,
-			"Yes",
-			"No",
+			vscode.l10n.t("{0} is already configured. Overwrite?", agent.name),
+			vscode.l10n.t("Yes"),
+			vscode.l10n.t("No"),
 		);
-		if (overwrite !== "Yes") {
+		if (overwrite !== vscode.l10n.t("Yes")) {
 			return;
 		}
 	}
@@ -242,7 +242,7 @@ async function installAgent(
 
 	const connection = ctx.registry.get(agent.id);
 	if (!connection) {
-		vscode.window.showInformationMessage(`${agent.name} added. Click the agent button to connect.`);
+		vscode.window.showInformationMessage(vscode.l10n.t("{0} added. Click the agent button to connect.", agent.name));
 		return;
 	}
 
@@ -250,7 +250,7 @@ async function installAgent(
 		await vscode.window.withProgress(
 			{
 				location: vscode.ProgressLocation.Window,
-				title: `Connecting to ${agent.name}...`,
+				title: vscode.l10n.t("Connecting to {0}...", agent.name),
 				cancellable: false,
 			},
 			async () => {
@@ -279,12 +279,12 @@ async function installAgent(
 
 		await vscode.commands.executeCommand("workbench.view.extension.vscodeAcp");
 
-		vscode.window.showInformationMessage(`${agent.name} connected and ready!`);
+		vscode.window.showInformationMessage(vscode.l10n.t("{0} connected and ready!", agent.name));
 	} catch (err) {
 		const errorMsg = err instanceof Error ? err.message : String(err);
 		ctx.state.setConnectionError(errorMsg);
 		vscode.window.showErrorMessage(
-			`Failed to connect to ${agent.name}: ${errorMsg}`,
+			vscode.l10n.t("Failed to connect to {0}: {1}", agent.name, errorMsg),
 		);
 	}
 }

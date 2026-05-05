@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect } from "react";
-import { useStore } from "../store";
-import { selAgents, selActiveAgent, selSelectAgent } from "../store/selectors";
+import { useEffect, useRef, useState } from "react";
 import { postMessage } from "../api/vscode";
+import { t } from "../i18n";
+import { useStore } from "../store";
+import { selActiveAgent, selAgents, selSelectAgent } from "../store/selectors";
 import "./AgentSelector.css";
 
 export function AgentSelector() {
@@ -34,16 +35,12 @@ export function AgentSelector() {
 
 	return (
 		<div className="acp-agent-selector" ref={ref}>
-			<button
-				type="button"
-				className="acp-agent-selector__trigger"
-				onClick={() => setOpen(!open)}
-			>
+			<button type="button" className="acp-agent-selector__trigger" onClick={() => setOpen(!open)}>
 				<span
 					className={`acp-agent-selector__dot acp-agent-selector__dot--${current?.status ?? "disconnected"}`}
 				/>
 				<span className="acp-agent-selector__label">
-					{current?.config.name ?? "Select Agent"}
+					{current?.config.name ?? t("agent.selectAgent")}
 				</span>
 				<svg
 					className={`acp-agent-selector__chevron ${open ? "is-open" : ""}`}
@@ -52,7 +49,13 @@ export function AgentSelector() {
 					viewBox="0 0 12 12"
 					fill="none"
 				>
-					<path d="M3 5L6 8L9 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+					<path
+						d="M3 5L6 8L9 5"
+						stroke="currentColor"
+						strokeWidth="1.5"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+					/>
 				</svg>
 			</button>
 			{open && (
@@ -67,7 +70,13 @@ export function AgentSelector() {
 									type="button"
 									className={`acp-agent-selector__toggle ${isActive ? "is-on" : isConnecting ? "is-connecting" : "is-off"}`}
 									onClick={() => handleToggle(agent.config.id)}
-									title={isActive ? "Disconnect" : isConnecting ? "Connecting..." : "Connect"}
+									title={
+										isActive
+											? t("agent.disconnect")
+											: isConnecting
+												? t("agent.connecting")
+												: t("agent.connect")
+									}
 								>
 									<span className="acp-agent-selector__toggle-track">
 										<span className="acp-agent-selector__toggle-thumb" />
@@ -85,9 +94,14 @@ export function AgentSelector() {
 						}}
 					>
 						<svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-							<path d="M8 3V13M3 8H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+							<path
+								d="M8 3V13M3 8H13"
+								stroke="currentColor"
+								strokeWidth="1.5"
+								strokeLinecap="round"
+							/>
 						</svg>
-						<span>Discover Agents</span>
+						<span>{t("agent.discoverAgents")}</span>
 					</button>
 				</div>
 			)}

@@ -2,6 +2,7 @@ import { useEffect, useRef, useCallback } from "react";
 import { useStore } from "../store";
 import { selActiveSession, selMessages, selIsStreaming } from "../store/selectors";
 import { MessageItem } from "./MessageItem";
+import { t } from "../i18n";
 import "./MessageList.css";
 
 export function MessageList() {
@@ -53,7 +54,7 @@ export function MessageList() {
 				</div>
 			)}
 			{sessionMessages.length === 0 && !isStreaming && (
-				<div className="acp-message-list__empty">No messages yet</div>
+				<div className="acp-message-list__empty">{t("message.noMessages")}</div>
 			)}
 		</div>
 	);

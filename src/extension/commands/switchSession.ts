@@ -6,7 +6,7 @@ export function registerSwitchSession(ctx: CommandContext): vscode.Disposable {
 		const sessions = ctx.state.state.sessions;
 
 		if (sessions.length === 0) {
-			vscode.window.showInformationMessage("No sessions available. Create one first.");
+			vscode.window.showInformationMessage(vscode.l10n.t("No sessions available. Create one first."));
 			return;
 		}
 
@@ -18,8 +18,8 @@ export function registerSwitchSession(ctx: CommandContext): vscode.Disposable {
 		}));
 
 		const picked = await vscode.window.showQuickPick(items, {
-			placeHolder: "Switch to session",
-			title: "ACP: Switch Session",
+			placeHolder: vscode.l10n.t("Switch to session"),
+			title: vscode.l10n.t("ACP: Switch Session"),
 		});
 
 		if (picked) {

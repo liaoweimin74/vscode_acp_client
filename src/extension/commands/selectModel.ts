@@ -7,25 +7,25 @@ export function registerSelectModel(ctx: CommandContext): vscode.Disposable {
 		const sessionId = ctx.state.activeSession;
 		const agentId = ctx.state.activeAgent;
 		if (!sessionId || !agentId) {
-			vscode.window.showWarningMessage("No active session. Create or switch to a session first.");
+			vscode.window.showWarningMessage(vscode.l10n.t("No active session. Create or switch to a session first."));
 			return;
 		}
 
 		const connection = ctx.registry.get(agentId);
 		if (!connection || !connection.isConnected) {
-			vscode.window.showErrorMessage("Agent is not connected.");
+			vscode.window.showErrorMessage(vscode.l10n.t("Agent is not connected."));
 			return;
 		}
 
 		const session = connection.getSession(sessionId);
 		if (!session) {
-			vscode.window.showErrorMessage("Session not found.");
+			vscode.window.showErrorMessage(vscode.l10n.t("Session not found."));
 			return;
 		}
 
 		const modelOption = session.configOptions.find((opt) => opt.id === "model");
 		if (!modelOption || modelOption.type !== "select") {
-			vscode.window.showInformationMessage("Model selection not available for this agent.");
+			vscode.window.showInformationMessage(vscode.l10n.t("Model selection not available for this agent."));
 			return;
 		}
 
@@ -33,13 +33,13 @@ export function registerSelectModel(ctx: CommandContext): vscode.Disposable {
 			const currentGroup = findGroupByValue(modelOption.options, modelOption.currentValue);
 			const groupItems = modelOption.options.map((g) => ({
 				label: g.name,
-				description: g.group === currentGroup?.group ? "$(check) Current" : "",
+				description: g.group === currentGroup?.group ? `$(check) ${vscode.l10n.t("Current")}` : "",
 				groupId: g.group,
 			}));
 
 			const pickedGroup = await vscode.window.showQuickPick(groupItems, {
-				placeHolder: "Select a model family",
-				title: "ACP: Select Model",
+				placeHolder: vscode.l10n.t("Select a model family"),
+				title: vscode.l10n.t("ACP: Select Model"),
 			});
 			if (!pickedGroup) return;
 
@@ -49,7 +49,7 @@ export function registerSelectModel(ctx: CommandContext): vscode.Disposable {
 			const levelOptions = group.options;
 			const levelItems = levelOptions.map((v) => ({
 				label: v.name,
-				description: v.value === modelOption.currentValue ? "$(check) Current" : "",
+				description: v.value === modelOption.currentValue ? `$(check) ${vscode.l10n.t("Current")}` : "",
 				valueId: v.value,
 			}));
 
@@ -59,17 +59,17 @@ export function registerSelectModel(ctx: CommandContext): vscode.Disposable {
 			}
 
 			const pickedLevel = await vscode.window.showQuickPick(levelItems, {
-				placeHolder: `Select level for ${group.name}`,
+				placeHolder: vscode.l10n.t("Select level for {0}", group.name),
 				title: `ACP: ${group.name}`,
 			});
 
 			if (pickedLevel) {
 				try {
 					await connection.setConfigOption(sessionId, "model", pickedLevel.valueId);
-					vscode.window.showInformationMessage(`Model set to ${pickedLevel.label}`);
+					vscode.window.showInformationMessage(vscode.l10n.t("Model set to {0}", pickedLevel.label));
 				} catch (err) {
 					vscode.window.showErrorMessage(
-						`Failed to set model: ${err instanceof Error ? err.message : String(err)}`,
+						vscode.l10n.t("Failed to set model: {0}", err instanceof Error ? err.message : String(err)),
 					);
 				}
 			}
@@ -77,22 +77,22 @@ export function registerSelectModel(ctx: CommandContext): vscode.Disposable {
 			const flatOptions = flattenSelectOptions(modelOption.options);
 			const items = flatOptions.map((v) => ({
 				label: v.name,
-				description: v.value === modelOption.currentValue ? "$(check) Current" : "",
+				description: v.value === modelOption.currentValue ? `$(check) ${vscode.l10n.t("Current")}` : "",
 				valueId: v.value,
 			}));
 
 			const picked = await vscode.window.showQuickPick(items, {
-				placeHolder: "Select a model",
-				title: "ACP: Select Model",
+				placeHolder: vscode.l10n.t("Select a model"),
+				title: vscode.l10n.t("ACP: Select Model"),
 			});
 
 			if (picked) {
 				try {
 					await connection.setConfigOption(sessionId, "model", picked.valueId);
-					vscode.window.showInformationMessage(`Model set to ${picked.label}`);
+					vscode.window.showInformationMessage(vscode.l10n.t("Model set to {0}", picked.label));
 				} catch (err) {
 					vscode.window.showErrorMessage(
-						`Failed to set model: ${err instanceof Error ? err.message : String(err)}`,
+						vscode.l10n.t("Failed to set model: {0}", err instanceof Error ? err.message : String(err)),
 					);
 				}
 			}

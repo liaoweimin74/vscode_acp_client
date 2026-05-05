@@ -12,6 +12,8 @@ vi.mock("../../src/webview/api/vscode", () => ({
 	setVsCodeState: vi.fn(),
 }));
 
+const connectedAgent = { config: { id: "agent_1", name: "Agent 1", command: "agent" }, status: "connected" };
+
 const modelOption: SessionConfigOption = {
 	id: "model",
 	category: "model",
@@ -40,13 +42,14 @@ describe("ConfigBar", () => {
 		useStore.setState({
 			activeAgent: "agent_1",
 			activeSession: "ses_1",
+			agents: [connectedAgent],
 			configOptions: [modelOption, thinkOption],
 		});
 		vi.clearAllMocks();
 	});
 
 	it("renders nothing when no active agent", () => {
-		useStore.setState({ activeAgent: null });
+		useStore.setState({ activeAgent: null, agents: [] });
 		const { container } = render(<ConfigBar />);
 		expect(container.innerHTML).toBe("");
 	});

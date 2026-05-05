@@ -222,20 +222,16 @@ describe("useStore", () => {
 	});
 
 	describe("sendMessage", () => {
-		it("posts send_prompt and optimistically adds user message", () => {
-			useStore.setState({ activeSession: "ses_1" });
-			useStore.getState().sendMessage("Hello");
-			expect(vscodeApi.postMessage).toHaveBeenCalledWith({
-				type: "send_prompt",
-				sessionId: "ses_1",
-				prompt: "Hello",
-			});
-			expect(useStore.getState().isStreaming).toBe(true);
-			const msgs = useStore.getState().messages.get("ses_1");
-			expect(msgs).toHaveLength(1);
-			expect(msgs![0].role).toBe("user");
-			expect(msgs![0].content).toBe("Hello");
+it("posts send_prompt and sets isStreaming", () => {
+		useStore.setState({ activeSession: "ses_1" });
+		useStore.getState().sendMessage("Hello");
+		expect(vscodeApi.postMessage).toHaveBeenCalledWith({
+			type: "send_prompt",
+			sessionId: "ses_1",
+			prompt: "Hello",
 		});
+		expect(useStore.getState().isStreaming).toBe(true);
+	});
 
 		it("posts send_prompt with empty sessionId when no active session", () => {
 			useStore.setState({ activeSession: null });
@@ -278,16 +274,18 @@ describe("useStore", () => {
 	});
 
 	describe("cancelPrompt", () => {
-		it("clears streaming state but preserves queued prompts", () => {
-			useStore.setState({
-				activeSession: "ses_1",
-				isStreaming: true,
-				queuedPrompts: ["queued msg"],
-			});
-			useStore.getState().cancelPrompt();
-			expect(useStore.getState().isStreaming).toBe(false);
-			expect(useStore.getState().queuedPrompts).toEqual(["queued msg"]);
+it("sends next queued prompt and keeps streaming state", () => {
+		useStore.setState({
+			activeSession: "ses_1",
+			isStreaming: true,
+			queuedPrompts: ["queued msg"],
 		});
+		useStore.getState().cancelPrompt();
+		expect(vscodeApi.postMessage).toHaveBeenCalledWith({ type: "cancel_prompt", sessionId: "ses_1" });
+		expect(vscodeApi.postMessage).toHaveBeenCalledWith({ type: "send_prompt", sessionId: "ses_1", prompt: "queued msg" });
+		expect(useStore.getState().isStreaming).toBe(true);
+		expect(useStore.getState().queuedPrompts).toEqual([]);
+	});
 	});
 
 	describe("sendQueuedPromptNow", () => {

@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import { t } from "../i18n";
 import { useStore } from "../store";
-import { selAgentRoles, selActiveRole, selSwitchRole } from "../store/selectors";
+import { selActiveRole, selAgentRoles, selSwitchRole } from "../store/selectors";
 import "./RoleSelector.css";
 
 export function RoleSelector() {
@@ -41,16 +42,18 @@ export function RoleSelector() {
 
 	return (
 		<div className="acp-role-selector" ref={ref}>
-			<button
-				type="button"
-				className="acp-role-selector__btn"
-				onClick={() => setOpen(!open)}
-			>
+			<button type="button" className="acp-role-selector__btn" onClick={() => setOpen(!open)}>
 				<svg width="14" height="14" viewBox="0 0 16 16" fill="none">
 					<circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.2" />
-					<path d="M5 8L7 10L11 6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+					<path
+						d="M5 8L7 10L11 6"
+						stroke="currentColor"
+						strokeWidth="1.2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+					/>
 				</svg>
-				<span>{currentRole?.name ?? agentRoles[0]?.name ?? "Role"}</span>
+				<span>{currentRole?.name ?? agentRoles[0]?.name ?? t("config.role")}</span>
 			</button>
 			{open && (
 				<div className="acp-role-selector__menu">

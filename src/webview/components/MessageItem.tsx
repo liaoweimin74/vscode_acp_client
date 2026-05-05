@@ -7,6 +7,7 @@ import type {
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { t } from "../i18n";
 import { CodeBlock } from "./CodeBlock";
 import { SubAgentView } from "./SubAgentView";
 import { ToolCallCard } from "./ToolCallCard";
@@ -28,7 +29,7 @@ function ThoughtChunks({ chunks }: { chunks: MessageChunkData[] }) {
 
 	return (
 		<details className="acp-message-item__thoughts">
-			<summary className="acp-message-item__thoughts-summary">Thinking...</summary>
+			<summary className="acp-message-item__thoughts-summary">{t("message.thinking")}</summary>
 			<div className="acp-message-item__thoughts-content">
 				<ReactMarkdown remarkPlugins={[remarkGfm]}>{combined}</ReactMarkdown>
 			</div>
@@ -61,7 +62,7 @@ function MessageFooter({
 	if (modelName) parts.push(modelName);
 	if (durationMs !== undefined) parts.push(formatDuration(durationMs));
 	if (usage?.tokensUsed !== undefined)
-		parts.push(`${formatTokens(usage.tokensUsed, usage.tokensTotal)} tokens`);
+		parts.push(`${formatTokens(usage.tokensUsed, usage.tokensTotal)} ${t("message.tokens")}`);
 	if (usage?.costAmount !== undefined) {
 		const cur = usage.costCurrency ?? "USD";
 		parts.push(`${usage.costAmount.toFixed(4)} ${cur}`);
@@ -129,7 +130,10 @@ function UserContent({ content }: { content: string }) {
 						components={{
 							code({ className, children, ...props }) {
 								const match = /language-(\w+)/.exec(className ?? "");
-								const codeStr = typeof children === "string" ? children.replace(/\n$/, "") : String(children).replace(/\n$/, "");
+								const codeStr =
+									typeof children === "string"
+										? children.replace(/\n$/, "")
+										: String(children).replace(/\n$/, "");
 								if (match) {
 									return <CodeBlock code={codeStr} language={match[1]} />;
 								}
@@ -177,7 +181,14 @@ export function MessageItem({ message, isStreaming }: MessageItemProps) {
 		<div className={`acp-message-item acp-message-item--${role}`}>
 			<div className="acp-message-item__avatar">
 				{role === "user" ? (
-					<svg width="16" height="16" viewBox="0 0 16 16" fill="none" role="img" aria-label="User">
+					<svg
+						width="16"
+						height="16"
+						viewBox="0 0 16 16"
+						fill="none"
+						role="img"
+						aria-label={t("message.user")}
+					>
 						<circle cx="8" cy="5" r="3" stroke="currentColor" strokeWidth="1.2" />
 						<path
 							d="M2 15C2 11.5 4.5 9 8 9C11.5 9 14 11.5 14 15"
@@ -193,7 +204,7 @@ export function MessageItem({ message, isStreaming }: MessageItemProps) {
 						viewBox="0 0 16 16"
 						fill="none"
 						role="img"
-						aria-label="Assistant"
+						aria-label={t("message.assistant")}
 					>
 						<rect
 							x="2"
@@ -217,7 +228,9 @@ export function MessageItem({ message, isStreaming }: MessageItemProps) {
 			</div>
 			<div className="acp-message-item__body">
 				<div className="acp-message-item__header">
-					<span className="acp-message-item__role">{role === "user" ? "You" : "Assistant"}</span>
+					<span className="acp-message-item__role">
+						{role === "user" ? t("message.you") : t("message.assistant")}
+					</span>
 					<span className="acp-message-item__time">{formatTime(timestamp)}</span>
 				</div>
 				{chunks && <ThoughtChunks chunks={chunks} />}
@@ -230,7 +243,10 @@ export function MessageItem({ message, isStreaming }: MessageItemProps) {
 							components={{
 								code({ className, children, ...props }) {
 									const match = /language-(\w+)/.exec(className ?? "");
-									const codeStr = typeof children === "string" ? children.replace(/\n$/, "") : String(children).replace(/\n$/, "");
+									const codeStr =
+										typeof children === "string"
+											? children.replace(/\n$/, "")
+											: String(children).replace(/\n$/, "");
 									if (match) {
 										return <CodeBlock code={codeStr} language={match[1]} />;
 									}

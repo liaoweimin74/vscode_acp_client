@@ -1,7 +1,7 @@
 {
   "name": "vscode-acp",
-  "displayName": "VSACP",
-  "description": "Connect AI coding CLIs via ACP protocol. Switch models, agents, view sub-agent context, manage sessions.",
+  "displayName": "%displayName%",
+  "description": "%description%",
   "version": "0.1.0",
   "publisher": "hexuya",
   "license": "MIT",
@@ -29,7 +29,7 @@
       "activitybar": [
         {
           "id": "vscodeAcp",
-          "title": "ACP Agent",
+          "title": "%viewsContainers.activitybar.title%",
           "icon": "media/icon.svg"
         }
       ]
@@ -39,49 +39,49 @@
         {
           "type": "webview",
           "id": "vscodeAcp.sidebar",
-          "name": "Agent Chat"
+          "name": "%views.vscodeAcp.name%"
         }
       ]
     },
     "commands": [
       {
         "command": "vscodeAcp.selectAgent",
-        "title": "ACP: Select Agent",
+        "title": "%command.selectAgent%",
         "category": "ACP"
       },
       {
         "command": "vscodeAcp.newSession",
-        "title": "ACP: New Session",
+        "title": "%command.newSession%",
         "category": "ACP"
       },
       {
         "command": "vscodeAcp.switchSession",
-        "title": "ACP: Switch Session",
+        "title": "%command.switchSession%",
         "category": "ACP"
       },
       {
         "command": "vscodeAcp.selectModel",
-        "title": "ACP: Select Model",
+        "title": "%command.selectModel%",
         "category": "ACP"
       },
       {
         "command": "vscodeAcp.setThoughtLevel",
-        "title": "ACP: Set Thought Level",
+        "title": "%command.setThoughtLevel%",
         "category": "ACP"
       },
       {
         "command": "vscodeAcp.openSettings",
-        "title": "ACP: Open Settings",
+        "title": "%command.openSettings%",
         "category": "ACP"
       },
       {
         "command": "vscodeAcp.discoverAgents",
-        "title": "ACP: Discover Agents",
+        "title": "%command.discoverAgents%",
         "category": "ACP"
       },
       {
         "command": "vscodeAcp.selectAgentRole",
-        "title": "ACP: Select Agent Role",
+        "title": "%command.selectAgentRole%",
         "category": "ACP"
       }
     ],
@@ -93,44 +93,44 @@
       }
     ],
     "configuration": {
-      "title": "VS ACP Client",
+      "title": "%configuration.title%",
       "properties": {
         "vscodeAcp.agents": {
           "type": "array",
           "default": [],
-          "description": "List of ACP-compatible agent configurations",
+          "description": "%configuration.agents.description%",
           "items": {
             "type": "object",
             "properties": {
               "id": {
                 "type": "string",
-                "description": "Unique identifier for the agent"
+                "description": "%configuration.agents.id.description%"
               },
               "name": {
                 "type": "string",
-                "description": "Display name"
+                "description": "%configuration.agents.name.description%"
               },
               "command": {
                 "type": "string",
-                "description": "CLI command to start the agent (e.g., 'opencode')"
+                "description": "%configuration.agents.command.description%"
               },
               "args": {
                 "type": "array",
                 "items": {
                   "type": "string"
                 },
-                "description": "Command arguments"
+                "description": "%configuration.agents.args.description%"
               },
               "env": {
                 "type": "object",
                 "additionalProperties": {
                   "type": "string"
                 },
-                "description": "Environment variables"
+                "description": "%configuration.agents.env.description%"
               },
               "cachedModels": {
                 "type": "array",
-                "description": "Cached model list from last session",
+                "description": "%configuration.agents.cachedModels.description%",
                 "items": {
                   "type": "object",
                   "properties": {
@@ -148,7 +148,7 @@
               },
               "cachedRoles": {
                 "type": "array",
-                "description": "Cached role list from last session",
+                "description": "%configuration.agents.cachedRoles.description%",
                 "items": {
                   "type": "object",
                   "properties": {
@@ -175,7 +175,7 @@
         "vscodeAcp.defaultAgent": {
           "type": "string",
           "default": "",
-          "description": "Default agent ID to use on startup"
+          "description": "%configuration.defaultAgent.description%"
         },
         "vscodeAcp.theme": {
           "type": "string",
@@ -185,7 +185,7 @@
             "dark"
           ],
           "default": "auto",
-          "description": "UI theme (auto follows VSCode theme)"
+          "description": "%configuration.theme.description%"
         },
         "vscodeAcp.logLevel": {
           "type": "string",
@@ -196,7 +196,7 @@
             "error"
           ],
           "default": "info",
-          "description": "Log level for the ACP Agent output channel"
+          "description": "%configuration.logLevel.description%"
         }
       }
     }

@@ -36,10 +36,10 @@ export class StatusBar {
 			}
 
 			this.item.text = text;
-			this.item.tooltip = `ACP: ${name}${activeSession ? ` — Session ${activeSession.slice(0, 8)}` : ""}`;
+			this.item.tooltip = vscode.l10n.t("ACP: {0}{1}", name, activeSession ? ` — ${vscode.l10n.t("Session")} ${activeSession.slice(0, 8)}` : "");
 		} else {
-			this.item.text = "$(robot) No Agent";
-			this.item.tooltip = "ACP: No agent selected";
+			this.item.text = `$(robot) ${vscode.l10n.t("No Agent")}`;
+			this.item.tooltip = vscode.l10n.t("ACP: No agent selected");
 		}
 	}
 

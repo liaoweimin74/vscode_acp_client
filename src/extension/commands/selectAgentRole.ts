@@ -24,7 +24,7 @@ export function registerSelectAgentRole(ctx: CommandContext): vscode.Disposable 
 			await connection.setSessionMode(sessionId, nextMode.id);
 		} catch (err) {
 			vscode.window.showErrorMessage(
-				`Failed to switch role: ${err instanceof Error ? err.message : String(err)}`,
+				vscode.l10n.t("Failed to switch role: {0}", err instanceof Error ? err.message : String(err)),
 			);
 		}
 	});

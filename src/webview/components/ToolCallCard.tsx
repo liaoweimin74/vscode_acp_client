@@ -1,5 +1,6 @@
 import type { ToolCallData, ToolCallDiff, ToolKind } from "@shared/types/extension";
 import { useMemo, useState } from "react";
+import { t } from "../i18n";
 import { CodeBlock } from "./CodeBlock";
 import "./ToolCallCard.css";
 
@@ -21,16 +22,16 @@ const KIND_ICONS: Record<ToolKind, string> = {
 };
 
 const KIND_LABELS: Record<ToolKind, string> = {
-	read: "Read",
-	edit: "Edit",
-	delete: "Delete",
-	move: "Move",
-	search: "Search",
-	execute: "Execute",
-	think: "Think",
-	fetch: "Fetch",
-	switch_mode: "Switch Mode",
-	other: "Tool",
+	read: t("tool.read"),
+	edit: t("tool.edit"),
+	delete: t("tool.delete"),
+	move: t("tool.move"),
+	search: t("tool.search"),
+	execute: t("tool.execute"),
+	think: t("tool.think"),
+	fetch: t("tool.fetch"),
+	switch_mode: t("tool.switchMode"),
+	other: t("tool.other"),
 };
 
 function DiffView({ diff }: { diff: ToolCallDiff }) {
@@ -176,7 +177,7 @@ function renderToolBody(toolCall: ToolCallData) {
 				const src = `data:${c.mimeType};base64,${c.data}`;
 				return (
 					<div key={key} className="acp-tool-card__image">
-						<img src={src} alt="Tool output" />
+						<img src={src} alt={t("tool.output")} />
 					</div>
 				);
 			}
@@ -185,7 +186,7 @@ function renderToolBody(toolCall: ToolCallData) {
 				return (
 					<div key={key} className="acp-tool-card__audio">
 						{/* biome-ignore lint/a11y/useMediaCaption: tool output audio, not media content */}
-						<audio controls={true} src={src} aria-label="Tool output audio" />
+						<audio controls={true} src={src} aria-label={t("tool.outputAudio")} />
 					</div>
 				);
 			}
@@ -352,7 +353,7 @@ export function ToolCallCard({ toolCall }: ToolCallCardProps) {
 				{status === "completed" && (
 					<span className="acp-tool-card__status acp-tool-card__status--done">✓</span>
 				)}
-				{isError && <span className="acp-tool-card__error-badge">Error</span>}
+				{isError && <span className="acp-tool-card__error-badge">{t("tool.error")}</span>}
 			</button>
 			{expanded && <div className="acp-tool-card__body">{renderToolBody(toolCall)}</div>}
 		</div>

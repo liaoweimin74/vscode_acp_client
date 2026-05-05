@@ -1,3 +1,5 @@
+import * as vscode from "vscode";
+
 export interface SlashCommand {
 	name: string;
 	description: string;
@@ -27,7 +29,7 @@ export class SlashCommandRegistry {
 	async execute(name: string, args: string): Promise<{ success: boolean; error?: string; builtin?: boolean }> {
 		const command = this.commands.get(name);
 		if (!command) {
-			return { success: false, error: `Unknown command: /${name}` };
+			return { success: false, error: vscode.l10n.t("Unknown command: /{0}", name) };
 		}
 		try {
 			await command.execute(args);

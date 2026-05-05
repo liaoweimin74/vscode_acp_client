@@ -1,5 +1,6 @@
 import type { MentionItem } from "@shared/types/extension";
 import { type KeyboardEvent, useEffect, useRef, useState } from "react";
+import { t } from "../i18n";
 import "./MentionMenu.css";
 
 interface MentionMenuProps {
@@ -61,7 +62,7 @@ export function MentionMenu({ items, query, onSelect, onClose }: MentionMenuProp
 		<div className="acp-mention-menu" ref={menuRef} role="listbox" tabIndex={-1}>
 			{actions.length > 0 && (
 				<div className="acp-mention-menu__section">
-					<div className="acp-mention-menu__section-header">Files & Folders</div>
+					<div className="acp-mention-menu__section-header">{t("mention.filesAndFolders")}</div>
 					{actions.map((item) => {
 						const globalIdx = filtered.indexOf(item);
 						return (
@@ -95,7 +96,7 @@ export function MentionMenu({ items, query, onSelect, onClose }: MentionMenuProp
 			)}
 			{roles.length > 0 && (
 				<div className="acp-mention-menu__section">
-					<div className="acp-mention-menu__section-header">Roles</div>
+					<div className="acp-mention-menu__section-header">{t("mention.roles")}</div>
 					{roles.map((item) => {
 						const globalIdx = filtered.indexOf(item);
 						return (

@@ -1,12 +1,21 @@
-import { useStore } from "./store";
+import { useEffect, useRef } from "react";
 import { AgentSelector } from "./components/AgentSelector";
-import { PromptInput } from "./components/PromptInput";
+import { CommandPopup } from "./components/CommandPopup";
 import { ConfigBar } from "./components/ConfigBar";
 import { MessageList } from "./components/MessageList";
-import { CommandPopup } from "./components/CommandPopup";
+import { PromptInput } from "./components/PromptInput";
 import { SessionSelector } from "./components/SessionSelector";
-import { useRef, useEffect } from "react";
-import { selActiveAgent, selActiveSession, selMessages, selSessions, selSessionMenuOpen, selOpenSessionMenu, selCloseSessionMenu } from "./store/selectors";
+import { t } from "./i18n";
+import { useStore } from "./store";
+import {
+	selActiveAgent,
+	selActiveSession,
+	selCloseSessionMenu,
+	selMessages,
+	selOpenSessionMenu,
+	selSessionMenuOpen,
+	selSessions,
+} from "./store/selectors";
 import "./App.css";
 
 export function App() {
@@ -43,13 +52,25 @@ export function App() {
 						<button
 							type="button"
 							className="acp-session-btn"
-							onClick={() => sessionMenuOpen ? closeSessionMenu() : openSessionMenu()}
-							title="Switch session"
+							onClick={() => (sessionMenuOpen ? closeSessionMenu() : openSessionMenu())}
+							title={t("session.switchSession")}
 						>
 							<svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-								<text x="8" y="13" textAnchor="middle" fontSize="12" fontWeight="bold" fill="#e0a800" stroke="none">S</text>
+								<text
+									x="8"
+									y="13"
+									textAnchor="middle"
+									fontSize="12"
+									fontWeight="bold"
+									fill="#e0a800"
+									stroke="none"
+								>
+									S
+								</text>
 							</svg>
-							<span className="acp-session-btn__label">{currentSession?.title || "Untitled"}</span>
+							<span className="acp-session-btn__label">
+								{currentSession?.title || t("session.untitled")}
+							</span>
 						</button>
 						{sessionMenuOpen && (
 							<div className="acp-session-dropdown">
@@ -61,14 +82,14 @@ export function App() {
 			</header>
 
 			<main className="acp-content">
-			{connected && (activeSession || hasMessages) ? (
-				<MessageList />
-			) : (
-				<div className="acp-content__empty">
-					<p>{!connected ? "Connect to an agent to start" : "Type a message to start chatting"}</p>
-				</div>
-			)}
-		</main>
+				{connected && (activeSession || hasMessages) ? (
+					<MessageList />
+				) : (
+					<div className="acp-content__empty">
+						<p>{!connected ? t("app.connectToStart") : t("app.typeToStart")}</p>
+					</div>
+				)}
+			</main>
 
 			<footer className="acp-footer">
 				<PromptInput />

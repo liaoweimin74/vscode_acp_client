@@ -6,13 +6,13 @@ export function registerNewSession(ctx: CommandContext): vscode.Disposable {
 	return vscode.commands.registerCommand("vscodeAcp.newSession", async () => {
 		const agentId = ctx.state.activeAgent;
 		if (!agentId) {
-			vscode.window.showWarningMessage("No agent selected. Select an agent first.");
+			vscode.window.showWarningMessage(vscode.l10n.t("No agent selected. Select an agent first."));
 			return;
 		}
 
 		const connection = ctx.registry.get(agentId);
 		if (!connection || !connection.isConnected) {
-			vscode.window.showErrorMessage("Agent is not connected. Reconnect and try again.");
+			vscode.window.showErrorMessage(vscode.l10n.t("Agent is not connected. Reconnect and try again."));
 			return;
 		}
 

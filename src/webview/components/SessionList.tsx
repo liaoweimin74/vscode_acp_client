@@ -1,5 +1,6 @@
 import { useStore } from "../store";
 import { selSessions, selActiveSession } from "../store/selectors";
+import { t } from "../i18n";
 import "./SessionList.css";
 
 export function SessionList() {
@@ -21,9 +22,9 @@ export function SessionList() {
 						useStore.getState().switchSession(session.id);
 					}}
 				>
-					<span className="acp-session-list__title">{session.title || "Untitled"}</span>
+					<span className="acp-session-list__title">{session.title || t("session.untitled")}</span>
 					<span className="acp-session-list__meta">
-						{session.messageCount} msg{session.messageCount !== 1 ? "s" : ""}
+						{t("session.msgCount", session.messageCount)}
 					</span>
 				</button>
 			))}

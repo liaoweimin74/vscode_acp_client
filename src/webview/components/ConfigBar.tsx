@@ -1,20 +1,37 @@
-import { useState, useRef, useEffect } from "react";
 import type { MentionItem } from "@shared/types/extension";
+import { flattenSelectOptions, getModelLevel, groupModelsByFamily } from "@shared/utils";
+import { useEffect, useRef, useState } from "react";
+import { postMessage } from "../api/vscode";
+import { t } from "../i18n";
 import { useStore } from "../store";
 import {
-	selSetConfig, selActiveAgent, selActiveSession, selConfigOptions,
-	selAgents, selSetMentionMenuOpen, selMentionMenuOpen, selAgentRoles,
+	selActiveAgent,
+	selActiveSession,
+	selAgentRoles,
+	selAgents,
+	selConfigOptions,
+	selMentionMenuOpen,
+	selSetConfig,
+	selSetMentionMenuOpen,
 } from "../store/selectors";
-import { postMessage } from "../api/vscode";
-import { flattenSelectOptions, groupModelsByFamily, getModelLevel } from "@shared/utils";
+import { MentionMenu } from "./MentionMenu";
 import { ModelSelector } from "./ModelSelector";
 import { RoleSelector } from "./RoleSelector";
-import { MentionMenu } from "./MentionMenu";
 import "./ConfigBar.css";
 
 const BROWSE_ACTIONS: MentionItem[] = [
-	{ type: "action", action: "browse-files", name: "Browse Files...", description: "Attach files to prompt" },
-	{ type: "action", action: "browse-folders", name: "Browse Folders...", description: "Attach directories to prompt" },
+	{
+		type: "action",
+		action: "browse-files",
+		name: t("mention.browseFiles"),
+		description: t("mention.attachFiles"),
+	},
+	{
+		type: "action",
+		action: "browse-folders",
+		name: t("mention.browseFolders"),
+		description: t("mention.attachDirectories"),
+	},
 ];
 
 export function ConfigBar() {
@@ -58,15 +75,19 @@ export function ConfigBar() {
 		return () => document.removeEventListener("click", handleClickOutside);
 	}, [setMentionMenuOpen]);
 
-	const connectedAgent = agents.find((a) => a.config.id === activeAgent && a.status === "connected");
+	const connectedAgent = agents.find(
+		(a) => a.config.id === activeAgent && a.status === "connected",
+	);
 
 	if (!connectedAgent) return null;
 
 	const modelOption = configOptions.find((opt) => opt.category === "model");
 	const thinkOption = configOptions.find((opt) => opt.category === "thought_level");
 
-	const modelOptions = modelOption?.type === "select" ? flattenSelectOptions(modelOption.options) : [];
-	const thinkOptions = thinkOption?.type === "select" ? flattenSelectOptions(thinkOption.options) : [];
+	const modelOptions =
+		modelOption?.type === "select" ? flattenSelectOptions(modelOption.options) : [];
+	const thinkOptions =
+		thinkOption?.type === "select" ? flattenSelectOptions(thinkOption.options) : [];
 	const modelGroups = modelOption?.type === "select" ? groupModelsByFamily(modelOptions) : [];
 
 	const currentModel = modelOption?.currentValue as string | undefined;
@@ -98,11 +119,16 @@ export function ConfigBar() {
 					type="button"
 					className="acp-config-bar__btn acp-config-bar__attach-btn"
 					onClick={() => setMentionMenuOpen(!mentionMenuOpen)}
-					title="Attach files or switch role"
-					aria-label="Attach files or switch role"
+					title={t("mention.attachOrSwitchRole")}
+					aria-label={t("mention.attachOrSwitchRole")}
 				>
 					<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-						<path d="M8 3V13M3 8H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+						<path
+							d="M8 3V13M3 8H13"
+							stroke="currentColor"
+							strokeWidth="1.5"
+							strokeLinecap="round"
+						/>
 					</svg>
 				</button>
 				{mentionMenuOpen && (
@@ -134,20 +160,35 @@ export function ConfigBar() {
 						onClick={() => setShowModelMenu(!showModelMenu)}
 					>
 						<svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-							<text x="8" y="13" textAnchor="middle" fontSize="12" fontWeight="bold" fill="#e0a800" stroke="none">M</text>
+							<text
+								x="8"
+								y="13"
+								textAnchor="middle"
+								fontSize="12"
+								fontWeight="bold"
+								fill="#e0a800"
+								stroke="none"
+							>
+								M
+							</text>
 						</svg>
-						<span>{currentGroup?.label || currentModelOpt?.name || "Model"}</span>
+						<span>{currentGroup?.label || currentModelOpt?.name || t("model.model")}</span>
 					</button>
 					{hasLevels && (
 						<div className="acp-config-bar__level-select-wrap">
 							<button
 								type="button"
 								className="acp-config-bar__level-trigger"
-								onClick={(e) => { e.stopPropagation(); setShowModelMenu(!showModelMenu); }}
+								onClick={(e) => {
+									e.stopPropagation();
+									setShowModelMenu(!showModelMenu);
+								}}
 							>
 								{(() => {
 									const level = getModelLevel(currentModelOpt?.name ?? "");
-									return level ? level.charAt(0).toUpperCase() + level.slice(1) : "Default";
+									return level
+										? level.charAt(0).toUpperCase() + level.slice(1)
+										: t("model.default");
 								})()}
 							</button>
 						</div>
@@ -173,9 +214,16 @@ export function ConfigBar() {
 						onClick={() => setShowThinkMenu(!showThinkMenu)}
 					>
 						<svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-							<path d="M2 4H14M2 8H14M2 12H10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+							<path
+								d="M2 4H14M2 8H14M2 12H10"
+								stroke="currentColor"
+								strokeWidth="1.2"
+								strokeLinecap="round"
+							/>
 						</svg>
-						<span>{thinkOptions.find((t) => t.value === currentThink)?.name || "Think"}</span>
+						<span>
+							{thinkOptions.find((opt) => opt.value === currentThink)?.name || t("config.think")}
+						</span>
 					</button>
 					{showThinkMenu && thinkOptions.length > 0 && (
 						<div className="acp-config-bar__menu">

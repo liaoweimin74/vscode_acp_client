@@ -29,7 +29,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	slashRegistry.register({
 		name: "model",
-		description: "Switch model",
+		description: vscode.l10n.t("Switch model"),
 		execute: async (args) => {
 			const sessionId = stateManager.activeSession;
 			const agentId = stateManager.activeAgent;
@@ -42,7 +42,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	slashRegistry.register({
 		name: "sessions",
-		description: "Switch session",
+		description: vscode.l10n.t("Switch session"),
 		builtin: true,
 		execute: async () => {
 			bridge.postMessage({
@@ -54,7 +54,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	slashRegistry.register({
 		name: "models",
-		description: "Switch model",
+		description: vscode.l10n.t("Switch model"),
 		builtin: true,
 		execute: async () => {
 			bridge.postMessage({
@@ -66,7 +66,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	slashRegistry.register({
 		name: "think",
-		description: "Set thought level",
+		description: vscode.l10n.t("Set thought level"),
 		execute: async (args) => {
 			const sessionId = stateManager.activeSession;
 			const agentId = stateManager.activeAgent;
@@ -79,7 +79,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	slashRegistry.register({
 		name: "agent",
-		description: "Switch agent",
+		description: vscode.l10n.t("Switch agent"),
 		execute: async (args) => {
 			vscode.commands.executeCommand("vscodeAcp.selectAgent");
 		},
@@ -87,7 +87,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	slashRegistry.register({
 		name: "clear",
-		description: "Clear conversation",
+		description: vscode.l10n.t("Clear conversation"),
 		execute: async () => {
 			bridge.postMessage({
 				type: "session_update",

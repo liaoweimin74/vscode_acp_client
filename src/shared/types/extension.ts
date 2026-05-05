@@ -28,6 +28,7 @@ export interface ExtensionState {
 	connectionError: string | null;
 	agentRoles: AgentRole[];
 	activeRole: string | null;
+	locale?: string;
 }
 
 export interface AgentInfo {

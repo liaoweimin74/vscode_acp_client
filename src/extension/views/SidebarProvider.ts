@@ -34,7 +34,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 			this.populateAgentRoles(state);
 			const log = Logger.getInstance();
 			log.info(`[STATE_UPDATE] activeAgent=${state.activeAgent}, activeSession=${state.activeSession}, configOptions=${state.configOptions?.length ?? 0}, agentRoles=${state.agentRoles?.length ?? 0}, activeRole=${state.activeRole}`);
-			this.bridge.postMessage({ type: "state_update", state });
+			this.bridge.postMessage({ type: "state_update", state: { ...state, locale: vscode.env.language } });
 		});
 
 		this.registry.on("agentAdded", () => {
@@ -319,7 +319,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 					canSelectFiles,
 					canSelectFolders,
 					canSelectMany: true,
-					title: canSelectFolders && !canSelectFiles ? "Select Folders" : "Select Files",
+					title: canSelectFolders && !canSelectFiles ? vscode.l10n.t("Select Folders") : vscode.l10n.t("Select Files"),
 				});
 				const files: import("../../shared/types/extension.js").FileAttachment[] = (uris ?? []).map((uri) => ({
 					path: uri.fsPath,
@@ -722,7 +722,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 		if (!session) {
 			this.state.setActiveSession(null);
 			this.state.setConfigOptions([]);
-			vscode.window.showWarningMessage("Session expired. Creating a new session...");
+			vscode.window.showWarningMessage(vscode.l10n.t("Session expired. Creating a new session..."));
 			vscode.commands.executeCommand("vscodeAcp.newSession");
 			return;
 		}
@@ -769,7 +769,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 			await connection.prompt(sessionId, prompt, attachments);
 		} catch (err) {
 			vscode.window.showErrorMessage(
-				`Prompt failed: ${err instanceof Error ? err.message : String(err)}`,
+				vscode.l10n.t("Prompt failed: {0}", err instanceof Error ? err.message : String(err)),
 			);
 		} finally {
 			const startTime = this._promptStartTimes.get(sessionId);
@@ -792,7 +792,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 			Logger.getInstance().warn(`setConfig: session ${sessionId} not found, clearing stale state`);
 			this.state.setActiveSession(null);
 			this.state.setConfigOptions([]);
-			vscode.window.showWarningMessage("Session expired. Creating a new session...");
+			vscode.window.showWarningMessage(vscode.l10n.t("Session expired. Creating a new session..."));
 			vscode.commands.executeCommand("vscodeAcp.newSession");
 			return;
 		}
@@ -802,7 +802,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 		} catch (err) {
 			const errMsg = err instanceof Error ? err.message : String(err);
 			Logger.getInstance().error(`setConfig FAILED: ${errMsg}`);
-			vscode.window.showErrorMessage(`Config change failed: ${errMsg}`);
+			vscode.window.showErrorMessage(vscode.l10n.t("Config change failed: {0}", errMsg));
 		}
 	}
 
@@ -825,7 +825,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 			await connection.cancel(sessionId);
 		} catch (err) {
 			vscode.window.showErrorMessage(
-				`Cancel failed: ${err instanceof Error ? err.message : String(err)}`,
+				vscode.l10n.t("Cancel failed: {0}", err instanceof Error ? err.message : String(err)),
 			);
 		}
 	}

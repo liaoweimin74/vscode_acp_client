@@ -2,6 +2,7 @@ import type { Message } from "@shared/types/extension";
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { t } from "../i18n";
 import { CodeBlock } from "./CodeBlock";
 import { ToolCallCard } from "./ToolCallCard";
 import "./SubAgentView.css";
@@ -14,7 +15,9 @@ interface SubAgentViewProps {
 function SubAgentMessage({ message }: { message: Message }) {
 	return (
 		<div className={`acp-sub-agent__msg acp-sub-agent__msg--${message.role}`}>
-			<div className="acp-sub-agent__msg-role">{message.role === "user" ? "You" : "Assistant"}</div>
+			<div className="acp-sub-agent__msg-role">
+				{message.role === "user" ? t("subAgent.you") : t("subAgent.assistant")}
+			</div>
 			<div className="acp-sub-agent__msg-content">
 				{message.role === "assistant" ? (
 					<ReactMarkdown
@@ -66,7 +69,7 @@ export function SubAgentView({ subAgentId, subAgentMessages }: SubAgentViewProps
 
 	const msgCount = subAgentMessages?.length ?? 0;
 	const toolCount = subAgentMessages?.reduce((n, m) => n + (m.toolCalls?.length ?? 0), 0) ?? 0;
-	const summary = `${msgCount} message${msgCount !== 1 ? "s" : ""}${toolCount > 0 ? ` · ${toolCount} tool${toolCount !== 1 ? "s" : ""}` : ""}`;
+	const summary = `${t("subAgent.messageCount", msgCount, msgCount !== 1 ? "s" : "")}${toolCount > 0 ? ` · ${t("subAgent.toolCount", toolCount, toolCount !== 1 ? "s" : "")}` : ""}`;
 
 	return (
 		<div className={`acp-sub-agent ${expanded ? "acp-sub-agent--expanded" : ""}`}>
@@ -98,7 +101,7 @@ export function SubAgentView({ subAgentId, subAgentMessages }: SubAgentViewProps
 					viewBox="0 0 16 16"
 					fill="none"
 					role="img"
-					aria-label="Sub-agent"
+					aria-label={t("subAgent.subAgent")}
 				>
 					<rect x="2" y="2" width="12" height="12" rx="3" stroke="currentColor" strokeWidth="1.2" />
 					<path
@@ -108,7 +111,7 @@ export function SubAgentView({ subAgentId, subAgentMessages }: SubAgentViewProps
 						strokeLinecap="round"
 					/>
 				</svg>
-				<span className="acp-sub-agent__label">Sub-agent</span>
+				<span className="acp-sub-agent__label">{t("subAgent.subAgent")}</span>
 				<span className="acp-sub-agent__summary">{summary}</span>
 			</button>
 			{expanded && subAgentMessages && subAgentMessages.length > 0 && (

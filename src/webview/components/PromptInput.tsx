@@ -15,22 +15,23 @@ import {
 } from "../store/selectors";
 import { MentionMenu } from "./MentionMenu";
 import { SlashCommandMenu } from "./SlashCommandMenu";
+import { t } from "../i18n";
 import "./PromptInput.css";
 
 const DEFAULT_COMMANDS = [
-	{ name: "/help", description: "Show available commands" },
-	{ name: "/sessions", description: "Switch session" },
-	{ name: "/models", description: "Switch model" },
-	{ name: "/think", description: "Set thought level" },
-	{ name: "/clear", description: "Clear conversation" },
-	{ name: "/agent", description: "Switch agent" },
+	{ name: "/help", description: t("command.help") },
+	{ name: "/sessions", description: t("command.sessions") },
+	{ name: "/models", description: t("command.models") },
+	{ name: "/think", description: t("command.think") },
+	{ name: "/clear", description: t("command.clear") },
+	{ name: "/agent", description: t("command.agent") },
 ];
 
 const BUILTIN_COMMANDS = new Set(["sessions", "models"]);
 
 const BROWSE_ACTIONS: MentionItem[] = [
-	{ type: "action", action: "browse-files", name: "Browse Files...", description: "Attach files to prompt" },
-	{ type: "action", action: "browse-folders", name: "Browse Folders...", description: "Attach directories to prompt" },
+	{ type: "action", action: "browse-files", name: t("mention.browseFiles"), description: t("mention.attachFiles") },
+	{ type: "action", action: "browse-folders", name: t("mention.browseFolders"), description: t("mention.attachDirectories") },
 ];
 
 /** Extract the @ mention query from text at cursor position */
@@ -258,10 +259,10 @@ export function PromptInput() {
 	const connectedAgent = agents.find((a) => a.config.id === activeAgent && a.status === "connected");
 	const isDisabled = !connectedAgent || !!connectionError;
 	const placeholder = connectionError
-		? `Connection error: ${connectionError}`
+		? t("prompt.placeholder.connectionError", connectionError)
 		: !connectedAgent
-			? "Connect to an agent first"
-			: "Type a message... (/ for commands, @ for roles & files)";
+			? t("prompt.placeholder.disconnected")
+			: t("prompt.placeholder.connected");
 
 	const attachments = useStore(selAttachments);
 	const removeAttachment = useStore(selRemoveAttachment);
@@ -269,7 +270,7 @@ export function PromptInput() {
 	return (
 		<div className="acp-prompt">
 			{escCancelTimer !== null && (
-				<div className="acp-prompt__cancel-hint">Press ESC again to cancel</div>
+				<div className="acp-prompt__cancel-hint">{t("prompt.cancelHint")}</div>
 			)}
 			{connectionError && !reconnectFailed && (
 				<div className="acp-prompt__error">
@@ -296,9 +297,9 @@ export function PromptInput() {
 							strokeLinecap="round"
 						/>
 					</svg>
-					<span>Agent connection lost.</span>
+					<span>{t("prompt.agentConnectionLost")}</span>
 					<button type="button" className="acp-prompt__reconnect-btn" onClick={reconnectAgent}>
-						Reconnect
+						{t("prompt.reconnect")}
 					</button>
 				</div>
 			)}
@@ -326,8 +327,8 @@ export function PromptInput() {
 								type="button"
 								className="acp-prompt__queue-remove"
 								onClick={() => removeQueuedPrompt(i)}
-								title="Remove from queue"
-								aria-label="Remove queued message"
+								title={t("prompt.removeFromQueue")}
+								aria-label={t("prompt.removeQueuedMessage")}
 							>
 								<svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
 									<path
@@ -343,8 +344,8 @@ export function PromptInput() {
 								type="button"
 								className="acp-prompt__queue-send"
 								onClick={() => sendQueuedPromptNow(i)}
-								title="Send now (cancel current)"
-								aria-label="Send queued message now"
+								title={t("prompt.sendNow")}
+								aria-label={t("prompt.sendQueuedMessageNow")}
 							>
 								<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
 									<path
@@ -376,8 +377,8 @@ export function PromptInput() {
 								type="button"
 								className="acp-prompt__attachment-remove"
 								onClick={() => removeAttachment(i)}
-								title="Remove attachment"
-								aria-label={`Remove ${att.name}`}
+								title={t("prompt.removeAttachment")}
+								aria-label={t("prompt.removeAttachment")}
 							>
 								<svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
 									<path d="M2 2L8 8M8 2L2 8" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
@@ -405,15 +406,15 @@ export function PromptInput() {
 								) : (
 									<>
 										<span className="acp-prompt__snippet-preview">{snippet.preview}...</span>
-										<span className="acp-prompt__snippet-count">{snippet.charCount} chars</span>
+										<span className="acp-prompt__snippet-count">{t("prompt.chars", snippet.charCount)}</span>
 									</>
 								)}
 								<button
 									type="button"
 									className="acp-prompt__attachment-remove"
 									onClick={(e) => { e.stopPropagation(); removePastedSnippet(i); }}
-									title="Remove snippet"
-									aria-label="Remove text snippet"
+								title={t("prompt.removeSnippet")}
+								aria-label={t("prompt.removeTextSnippet")}
 								>
 									<svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
 										<path d="M2 2L8 8M8 2L2 8" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
@@ -435,15 +436,15 @@ export function PromptInput() {
 					placeholder={placeholder}
 					disabled={isDisabled}
 					rows={1}
-					aria-label="Message input"
+					aria-label={t("prompt.messageInput")}
 				/>
 				<button
 					type="button"
 					className="acp-prompt__send"
 					onClick={handleSend}
 					disabled={(!inputText.trim() && pastedSnippets.length === 0) || !activeAgent || !!connectionError}
-					title={isStreaming ? "Queue message (Enter)" : "Send message (Enter)"}
-					aria-label={isStreaming ? "Queue message" : "Send message"}
+					title={isStreaming ? t("prompt.queueMessage") : t("prompt.sendMessage")}
+					aria-label={isStreaming ? t("prompt.queueMessageShort") : t("prompt.sendMessageShort")}
 				>
 					<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
 						<path

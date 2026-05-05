@@ -34,7 +34,7 @@ export function registerConnectAgent(ctx: CommandContext): vscode.Disposable {
 	return vscode.commands.registerCommand("vscodeAcp.connectAgent", async (agentId: string) => {
 		const connection = ctx.registry.get(agentId);
 		if (!connection) {
-			vscode.window.showWarningMessage(`Agent "${agentId}" not found.`);
+			vscode.window.showWarningMessage(vscode.l10n.t('Agent "{0}" not found.', agentId));
 			return;
 		}
 
@@ -43,7 +43,7 @@ export function registerConnectAgent(ctx: CommandContext): vscode.Disposable {
 				await vscode.window.withProgress(
 					{
 						location: vscode.ProgressLocation.Window,
-						title: `Connecting to ${connection.config.name}...`,
+						title: vscode.l10n.t("Connecting to {0}...", connection.config.name),
 						cancellable: false,
 					},
 					async () => {
@@ -57,7 +57,7 @@ export function registerConnectAgent(ctx: CommandContext): vscode.Disposable {
 				ctx.state.setActiveAgent(null);
 				ctx.state.setActiveSession(null);
 				ctx.state.setConfigOptions([]);
-				vscode.window.showErrorMessage(`Failed to connect: ${errorMsg}`);
+				vscode.window.showErrorMessage(vscode.l10n.t("Failed to connect: {0}", errorMsg));
 				return;
 			}
 		}

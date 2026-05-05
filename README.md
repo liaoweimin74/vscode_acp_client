@@ -1,6 +1,8 @@
-# ACP - AI Agent Client for VSCode
+# ACP - VSCode AI Agent Client
 
-Connect AI coding CLIs via the [Agent Client Protocol (ACP)](https://github.com/AcpProtocol/acp). Switch models, agents, view sub-agent context, and manage sessions — all from your VSCode sidebar.
+A feature-rich VSCode extension that connects AI coding CLIs via the [Agent Client Protocol (ACP)](https://github.com/AcpProtocol/acp) to enable AI agent programming. The extension supports ACP-protocol CLI tools such as OpenCode, Claude Code, Codex, and more.
+Switch models, agents, view sub-agent context, and manage sessions — all from your VSCode sidebar.
+100% of the code is implemented through AI agent programming using the OpenCode CLI tool.
 
 ## Features
 
@@ -22,7 +24,7 @@ Connect AI coding CLIs via the [Agent Client Protocol (ACP)](https://github.com/
 
 ### Installation
 
-1. Install from the VSCode Marketplace (or load the `.vsix` manually)
+1. Load the `.vsix` file manually (not yet published to the VSCode Marketplace)
 2. Open Settings → search for `ACP`
 3. Configure your agents in `vscodeAcp.agents`
 
