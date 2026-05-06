@@ -10,26 +10,12 @@ import type {
 	SessionUpdate,
 } from "@agentclientprotocol/sdk";
 
-export interface CachedModel {
-	id: string;
-	name: string;
-	value: string;
-}
-
-export interface CachedRole {
-	id: string;
-	name: string;
-	description?: string;
-}
-
 export interface AgentConfig {
 	id: string;
 	name: string;
 	command: string;
 	args?: string[];
 	env?: Record<string, string>;
-	cachedModels?: CachedModel[];
-	cachedRoles?: CachedRole[];
 }
 
 export interface Session {

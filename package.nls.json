@@ -18,8 +18,6 @@
   "configuration.agents.command.description": "CLI command to start the agent (e.g., 'opencode')",
   "configuration.agents.args.description": "Command arguments",
   "configuration.agents.env.description": "Environment variables",
-  "configuration.agents.cachedModels.description": "Cached model list from last session",
-  "configuration.agents.cachedRoles.description": "Cached role list from last session",
   "configuration.defaultAgent.description": "Default agent ID to use on startup",
   "configuration.theme.description": "UI theme (auto follows VSCode theme)",
   "configuration.logLevel.description": "Log level for the ACP Agent output channel"

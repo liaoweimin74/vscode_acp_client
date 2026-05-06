@@ -18,8 +18,6 @@
   "configuration.agents.command.description": "启动代理的 CLI 命令（如 'opencode'）",
   "configuration.agents.args.description": "命令参数",
   "configuration.agents.env.description": "环境变量",
-  "configuration.agents.cachedModels.description": "上次会话缓存的模型列表",
-  "configuration.agents.cachedRoles.description": "上次会话缓存的角色列表",
   "configuration.defaultAgent.description": "启动时使用的默认代理 ID",
   "configuration.theme.description": "UI 主题（auto 跟随 VSCode 主题）",
   "configuration.logLevel.description": "ACP 代理输出通道的日志级别"

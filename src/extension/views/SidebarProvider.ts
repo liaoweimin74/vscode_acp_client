@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import type { AgentRegistry } from "../../protocol/AgentRegistry.js";
 import type { ExtensionMessage, ExtensionState } from "../../shared/types/extension.js";
-import type { CachedModel, CachedRole, SessionConfigOption } from "../../shared/types/acp.js";
+import type { SessionConfigOption } from "../../shared/types/acp.js";
 import { Logger } from "../Logger.js";
 import type { SlashCommandRegistry } from "../SlashCommandRegistry.js";
 import type { StateManager } from "../StateManager.js";
@@ -87,10 +87,19 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 	}
 
 	private pushState(): void {
-		const agents = this.registry.getAll().map((conn) => ({
-			config: conn.config,
-			status: conn.isConnected ? ("connected" as const) : ("disconnected" as const),
-		}));
+		const agents = this.registry.getAll().map((conn) => {
+			let status: "connected" | "disconnected" | "connecting" | "error";
+			if (conn.isConnected) {
+				status = "connected";
+			} else if (conn.state.connected && !conn.state.initialized) {
+				status = "connecting";
+			} else if (this.state.state.connectionError && this.state.state.activeAgent === conn.config.id) {
+				status = "error";
+			} else {
+				status = "disconnected";
+			}
+			return { config: conn.config, status };
+		});
 
 		this.state.batch(() => {
 			this.state.setAgents(agents);
@@ -346,10 +355,6 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 		if (!session) {
 			try {
 				await connection.resumeSession(sessionId, cwd);
-				const resumedSession = connection.getSession(sessionId);
-				if (resumedSession) {
-					this.updateCachedFromSession(agentId, resumedSession.configOptions ?? [], resumedSession.models, resumedSession.modes);
-				}
 			} catch {
 				return;
 			}
@@ -360,10 +365,6 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 				this.sessionMessages.delete(sessionId);
 				this.sessionUpdates.delete(sessionId);
 				await connection.loadSession(sessionId, cwd);
-				const loadedSession = connection.getSession(sessionId);
-				if (loadedSession) {
-					this.updateCachedFromSession(agentId, loadedSession.configOptions ?? [], loadedSession.models, loadedSession.modes);
-				}
 				const msgs = this.sessionMessages.get(sessionId) ?? [];
 				this.bridge.postMessage({ type: "session_messages", sessionId, messages: msgs });
 			} catch (err) {
@@ -830,48 +831,5 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 		}
 	}
 
-	updateCachedFromSession(
-		agentId: string,
-		configOptions: SessionConfigOption[],
-		modelsState?: import("../../shared/types/acp.js").SessionModelState,
-		modesState?: { availableModes?: Array<{ id: string; name: string; description?: string | null }>; currentModeId?: string | null },
-	): void {
-		let cachedModels: CachedModel[] | undefined;
 
-		const modelOption = configOptions.find((o) => o.category === "model" && o.type === "select");
-		if (modelOption && modelOption.type === "select") {
-			const flat = "group" in (modelOption.options[0] ?? {})
-				? (modelOption.options as { options: { name?: string; value?: string }[] }[]).flatMap((g) => g.options)
-				: modelOption.options as { name?: string; value?: string }[];
-			cachedModels = flat.map((o) => ({
-				id: o.value ?? o.name ?? "",
-				name: o.name ?? o.value ?? "",
-				value: o.value ?? "",
-			}));
-		} else if (modelsState?.availableModels?.length) {
-			cachedModels = modelsState.availableModels.map((m) => ({
-				id: m.modelId,
-				name: m.name,
-				value: m.modelId,
-			}));
-		}
-
-		let cachedRoles: CachedRole[] | undefined;
-		if (modesState?.availableModes?.length) {
-			const seen = new Set<string>();
-			cachedRoles = modesState.availableModes
-				.filter((m) => { if (seen.has(m.id)) return false; seen.add(m.id); return true; })
-				.map((m) => ({ id: m.id, name: m.name, description: m.description ?? undefined }));
-		}
-
-		if (cachedModels?.length || cachedRoles?.length) {
-			this.configManager.updateCachedModelsAndRoles(
-				agentId,
-				cachedModels,
-				cachedRoles,
-			).catch((err) => {
-				Logger.getInstance().error("updateCachedModelsAndRoles FAILED: " + err);
-			});
-		}
-	}
 }

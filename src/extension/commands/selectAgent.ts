@@ -131,7 +131,6 @@ export function registerSelectAgent(ctx: CommandContext): vscode.Disposable {
 							messageCount: 0,
 						});
 					});
-					ctx.sidebarProvider.updateCachedFromSession(picked.agentId, s.configOptions ?? [], s.models, s.modes);
 				} catch (err) {
 					Logger.getInstance().error("createSession FAILED on select: " + err);
 				}

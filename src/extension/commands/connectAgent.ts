@@ -147,7 +147,6 @@ export function registerConnectAgent(ctx: CommandContext): vscode.Disposable {
 						messageCount: 0,
 					});
 				});
-				ctx.sidebarProvider.updateCachedFromSession(agentId, s.configOptions ?? [], s.models, s.modes);
 			} catch (err) {
 				Logger.getInstance().error("createSession FAILED on connect: " + err);
 			}

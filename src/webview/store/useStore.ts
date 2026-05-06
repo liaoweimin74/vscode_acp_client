@@ -96,7 +96,7 @@ export const useStore = create<UIState>((set, get) => {
 				const currentAgents = get().agents;
 				const mergedAgents = (msg.state.agents ?? []).map((incoming: any) => {
 					const current = currentAgents.find((a) => a.config.id === incoming.config.id);
-					if (current?.status === "connecting" && incoming.status !== "connected") {
+					if (current?.status === "connecting" && incoming.status === "connecting") {
 						return { ...incoming, status: "connecting" as const };
 					}
 					return incoming;

@@ -63,19 +63,22 @@ export function AgentSelector() {
 					{agents.map((agent) => {
 						const isActive = agent.status === "connected";
 						const isConnecting = agent.status === "connecting";
+						const isError = agent.status === "error";
 						return (
 							<div key={agent.config.id} className="acp-agent-selector__item">
 								<span className="acp-agent-selector__item-name">{agent.config.name}</span>
 								<button
 									type="button"
-									className={`acp-agent-selector__toggle ${isActive ? "is-on" : isConnecting ? "is-connecting" : "is-off"}`}
+									className={`acp-agent-selector__toggle ${isActive ? "is-on" : isConnecting ? "is-connecting" : isError ? "is-error" : "is-off"}`}
 									onClick={() => handleToggle(agent.config.id)}
 									title={
 										isActive
 											? t("agent.disconnect")
 											: isConnecting
 												? t("agent.connecting")
-												: t("agent.connect")
+												: isError
+													? t("agent.connect")
+													: t("agent.connect")
 									}
 								>
 									<span className="acp-agent-selector__toggle-track">

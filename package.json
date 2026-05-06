@@ -127,42 +127,6 @@
                   "type": "string"
                 },
                 "description": "%configuration.agents.env.description%"
-              },
-              "cachedModels": {
-                "type": "array",
-                "description": "%configuration.agents.cachedModels.description%",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "value": {
-                      "type": "string"
-                    }
-                  }
-                }
-              },
-              "cachedRoles": {
-                "type": "array",
-                "description": "%configuration.agents.cachedRoles.description%",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "description": {
-                      "type": "string"
-                    }
-                  }
-                }
               }
             },
             "required": [

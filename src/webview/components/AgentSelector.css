@@ -133,6 +133,10 @@
 	animation: acp-pulse 1s ease-in-out infinite;
 }
 
+.acp-agent-selector__toggle.is-error .acp-agent-selector__toggle-track {
+	background: var(--acp-error);
+}
+
 .acp-agent-selector__toggle-thumb {
 	position: absolute;
 	top: 2px;
@@ -153,6 +157,10 @@
 
 .acp-agent-selector__toggle.is-connecting .acp-agent-selector__toggle-thumb {
 	left: 8px;
+}
+
+.acp-agent-selector__toggle.is-error .acp-agent-selector__toggle-thumb {
+	left: 2px;
 }
 
 .acp-agent-selector__discover {
