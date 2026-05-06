@@ -9,5 +9,15 @@ tsconfig.json
 biome.json
 vite.config.ts
 vitest.config.ts
+vitest.webview.config.ts
+tsconfig.e2e.json
 esbuild.config.js
+playwright.config.ts
 superspec/**
+openspec/**
+.opencode/**
+tests/**
+test-results/**
+paseo.json
+AGENTS.md
+README_zh.md

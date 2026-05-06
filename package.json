@@ -3,7 +3,7 @@
   "displayName": "%displayName%",
   "description": "%description%",
   "version": "0.1.0",
-  "publisher": "hexuya",
+  "publisher": "foxweimin",
   "license": "MIT",
   "engines": {
     "vscode": "^1.85.0"
