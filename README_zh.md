@@ -39,17 +39,8 @@
       "id": "opencode",
       "name": "OpenCode",
       "command": "opencode",
-      "args": ["serve"],
+      "args": ["acp"],
       "env": {}
-    },
-    {
-      "id": "my-agent",
-      "name": "My Custom Agent",
-      "command": "my-agent-cli",
-      "args": [],
-      "env": {
-        "API_KEY": "sk-..."
-      }
     }
   ],
   "vscodeAcp.defaultAgent": "opencode"
@@ -65,6 +56,134 @@
 | `command` | 是 | 启动 Agent 的 CLI 命令 |
 | `args` | 否 | 命令行参数 |
 | `env` | 否 | 传递给进程的环境变量 |
+
+### 支持的 Agent
+
+#### OpenCode
+
+[OpenCode](https://github.com/opencode-ai/opencode) 原生支持 ACP，通过 `acp` 子命令启动。
+
+**前置条件**：安装 OpenCode（`npm install -g opencode-ai` 或从 [releases](https://github.com/opencode-ai/opencode/releases) 下载）
+
+```json
+{
+  "vscodeAcp.agents": [
+    {
+      "id": "opencode",
+      "name": "OpenCode",
+      "command": "opencode",
+      "args": ["acp"],
+      "env": {}
+    }
+  ]
+}
+```
+
+#### Claude Code
+
+[Claude Code](https://docs.anthropic.com/en/docs/claude-code) 需要通过 `@zed-industries/claude-code-acp` 适配器来支持 ACP。
+
+**前置条件**：
+1. 安装 Claude Code：`npm install -g @anthropic-ai/claude-code`
+2. 完成认证：`claude setup-token`
+3. 安装 ACP 适配器：`npm install -g @zed-industries/claude-code-acp`
+
+```json
+{
+  "vscodeAcp.agents": [
+    {
+      "id": "claude",
+      "name": "Claude Code",
+      "command": "claude-code-acp",
+      "args": [],
+      "env": {
+        "ANTHROPIC_API_KEY": "sk-ant-..."
+      }
+    }
+  ]
+}
+```
+
+> **注意**：如果已通过 `claude setup-token` 完成认证，可以省略 `ANTHROPIC_API_KEY` 环境变量，适配器会使用已有的 Claude Code 会话。
+
+#### Codex CLI
+
+[Codex CLI](https://github.com/openai/codex) 需要通过 `codex-acp` 适配器来支持 ACP。
+
+**前置条件**：
+1. 从 [OpenAI](https://codex.openai.com) 安装 Codex CLI
+2. 安装 ACP 适配器：按照 [cola-io/codex-acp](https://github.com/cola-io/codex-acp) 的说明操作
+
+```json
+{
+  "vscodeAcp.agents": [
+    {
+      "id": "codex",
+      "name": "Codex",
+      "command": "codex-acp",
+      "args": [],
+      "env": {
+        "OPENAI_API_KEY": "sk-..."
+      }
+    }
+  ]
+}
+```
+
+#### Gemini CLI
+
+Gemini CLI 原生支持 ACP，通过 `--acp` 参数启动。
+
+**前置条件**：安装 Gemini CLI（按照 [Google 的说明](https://github.com/google-gemini/gemini-cli) 操作）
+
+```json
+{
+  "vscodeAcp.agents": [
+    {
+      "id": "gemini",
+      "name": "Gemini",
+      "command": "gemini",
+      "args": ["--acp"],
+      "env": {}
+    }
+  ]
+}
+```
+
+#### 配置多个 Agent
+
+可以同时配置多个 Agent，在侧边栏中随时切换：
+
+```json
+{
+  "vscodeAcp.agents": [
+    {
+      "id": "opencode",
+      "name": "OpenCode",
+      "command": "opencode",
+      "args": ["acp"],
+      "env": {}
+    },
+    {
+      "id": "claude",
+      "name": "Claude Code",
+      "command": "claude-code-acp",
+      "args": [],
+      "env": {}
+    },
+    {
+      "id": "codex",
+      "name": "Codex",
+      "command": "codex-acp",
+      "args": [],
+      "env": {
+        "OPENAI_API_KEY": "sk-..."
+      }
+    }
+  ],
+  "vscodeAcp.defaultAgent": "opencode"
+}
+```
 
 ## 使用方法
 

@@ -39,17 +39,8 @@ Add agents to your VSCode settings:
       "id": "opencode",
       "name": "OpenCode",
       "command": "opencode",
-      "args": ["serve"],
+      "args": ["acp"],
       "env": {}
-    },
-    {
-      "id": "my-agent",
-      "name": "My Custom Agent",
-      "command": "my-agent-cli",
-      "args": [],
-      "env": {
-        "API_KEY": "sk-..."
-      }
     }
   ],
   "vscodeAcp.defaultAgent": "opencode"
@@ -65,6 +56,134 @@ Add agents to your VSCode settings:
 | `command` | Yes | CLI command to start the agent |
 | `args` | No | Command-line arguments |
 | `env` | No | Environment variables passed to the process |
+
+### Supported Agents
+
+#### OpenCode
+
+[OpenCode](https://github.com/opencode-ai/opencode) natively supports ACP via the `acp` subcommand.
+
+**Prerequisites**: Install OpenCode (`npm install -g opencode-ai` or download from [releases](https://github.com/opencode-ai/opencode/releases))
+
+```json
+{
+  "vscodeAcp.agents": [
+    {
+      "id": "opencode",
+      "name": "OpenCode",
+      "command": "opencode",
+      "args": ["acp"],
+      "env": {}
+    }
+  ]
+}
+```
+
+#### Claude Code
+
+[Claude Code](https://docs.anthropic.com/en/docs/claude-code) requires the `@zed-industries/claude-code-acp` adapter to work with ACP clients.
+
+**Prerequisites**:
+1. Install Claude Code: `npm install -g @anthropic-ai/claude-code`
+2. Authenticate: `claude setup-token`
+3. Install the ACP adapter: `npm install -g @zed-industries/claude-code-acp`
+
+```json
+{
+  "vscodeAcp.agents": [
+    {
+      "id": "claude",
+      "name": "Claude Code",
+      "command": "claude-code-acp",
+      "args": [],
+      "env": {
+        "ANTHROPIC_API_KEY": "sk-ant-..."
+      }
+    }
+  ]
+}
+```
+
+> **Note**: If you have already authenticated via `claude setup-token`, you can omit the `ANTHROPIC_API_KEY` environment variable. The adapter will use the existing Claude Code session.
+
+#### Codex CLI
+
+[Codex CLI](https://github.com/openai/codex) requires the `codex-acp` adapter for ACP compatibility.
+
+**Prerequisites**:
+1. Install Codex CLI from [OpenAI](https://codex.openai.com)
+2. Install the ACP adapter: follow instructions at [cola-io/codex-acp](https://github.com/cola-io/codex-acp)
+
+```json
+{
+  "vscodeAcp.agents": [
+    {
+      "id": "codex",
+      "name": "Codex",
+      "command": "codex-acp",
+      "args": [],
+      "env": {
+        "OPENAI_API_KEY": "sk-..."
+      }
+    }
+  ]
+}
+```
+
+#### Gemini CLI
+
+Gemini CLI natively supports ACP via the `--acp` flag.
+
+**Prerequisites**: Install Gemini CLI (`npm install -g @anthropic-ai/gemini-cli` or follow [Google's instructions](https://github.com/google-gemini/gemini-cli))
+
+```json
+{
+  "vscodeAcp.agents": [
+    {
+      "id": "gemini",
+      "name": "Gemini",
+      "command": "gemini",
+      "args": ["--acp"],
+      "env": {}
+    }
+  ]
+}
+```
+
+#### Multiple Agents
+
+You can configure multiple agents and switch between them from the sidebar:
+
+```json
+{
+  "vscodeAcp.agents": [
+    {
+      "id": "opencode",
+      "name": "OpenCode",
+      "command": "opencode",
+      "args": ["acp"],
+      "env": {}
+    },
+    {
+      "id": "claude",
+      "name": "Claude Code",
+      "command": "claude-code-acp",
+      "args": [],
+      "env": {}
+    },
+    {
+      "id": "codex",
+      "name": "Codex",
+      "command": "codex-acp",
+      "args": [],
+      "env": {
+        "OPENAI_API_KEY": "sk-..."
+      }
+    }
+  ],
+  "vscodeAcp.defaultAgent": "opencode"
+}
+```
 
 ## Usage
 
