@@ -1,7 +1,7 @@
 # ACP - VSCode AI Agent 客户端
 
 一个功能比较完备的vscode插件，通过 [Agent Client Protocol (ACP)](https://github.com/AcpProtocol/acp) 连接 AI 编码 CLI，实现AI代理编程。插件支持opencode,claude code,codex等支持acp协议的CLI工具。 
-支持切换模型、Agent角色、查看子 Agent 上下文以及管理会话—，一切尽在 VSCode 侧边栏。  
+支持切换模型、Agent角色、查看子 Agent 上下文以及管理会话，一切尽在 VSCode 侧边栏。  
 代码100%都是通过opencode CLI工具由ai 代理编程实现的。
 
 ## 功能特性
