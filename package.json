@@ -2,7 +2,7 @@
   "name": "vscode-acp",
   "displayName": "%displayName%",
   "description": "%description%",
-  "version": "0.1.0",
+  "version": "v1.0.0-alpha.1",
   "publisher": "foxweimin",
   "license": "MIT",
   "engines": {
