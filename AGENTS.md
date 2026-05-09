@@ -1,73 +1,73 @@
 <!-- superspec:start -->
-# SuperSpec — AI Agent Instructions
+# SuperSpec — AI Agent 指令
 
-## 🚨 Before ANY Task
+## 🚨 执行任何任务前
 
-1. **Read configuration**: `superspec.config.json` → get `lang`, `specDir`, `boost`, `strategy`, `context`
-2. **Review project context**:
-   - Read `context` files (project rules/conventions)
-   - Check project README, architecture docs, CONTRIBUTING.md
-   - If no `context` configured, auto-check: `.cursor/rules/`, `AGENTS.md`, `CONTRIBUTING.md`
-3. **Inspect current state**:
-   - Run `/ss-status` or check `{specDir}/changes/` → know active changes
-   - Review related changes via `depends_on` to avoid duplication
-4. **Read current change context**:
-   - Determine `strategy` by priority: user input `-c` > config default
-   - Read frontmatter `input` field → understand original user intent
-   - If `strategy: follow` → treat context files as constraints (must follow)
-   - If `strategy: create` → treat context files as awareness (may deviate, must justify)
-5. **Never create change folders manually** → use `superspec create` CLI or `/ss-create`
-
----
-
-## 🧭 First Principles
-
-| # | Principle | Rule |
-|---|-----------|------|
-| I | **Context Economy** | < 300 lines per artifact, 400 hard limit. Exceeds → split. Readable in 10 min. |
-| II | **Signal-to-Noise** | Every sentence must inform a decision. If removing it changes nothing → remove it. |
-| III | **Intent Over Implementation** | Focus on **why** and **what**. Let **how** emerge during `/ss-apply`. |
-| IV | **Progressive Disclosure** | Start minimal. Expand only when clarification demands it. |
-| V | **Required Sections** | Metadata header, Problem, Solution, Success Criteria, Trade-offs. |
+1. **读取配置**：`superspec.config.json` → 获取 `lang`、`specDir`、`boost`、`strategy`、`context`
+2. **审查项目上下文**：
+   - 读取 `context` 文件（项目规则/约定）
+   - 检查项目 README、架构文档、CONTRIBUTING.md
+   - 若未配置 `context`，自动检查：`.cursor/rules/`、`AGENTS.md`、`CONTRIBUTING.md`
+3. **检查当前状态**：
+   - 运行 `/ss-status` 或检查 `{specDir}/changes/` → 了解活跃变更
+   - 通过 `depends_on` 审查相关变更，避免重复
+4. **读取当前变更上下文**：
+   - 按优先级确定 `strategy`：用户输入 `-c` > 配置默认值
+   - 读取 frontmatter `input` 字段 → 理解用户原始意图
+   - 若 `strategy: follow` → 将上下文文件视为约束（必须遵循）
+   - 若 `strategy: create` → 将上下文文件视为参考（可偏离，但需说明理由）
+5. **禁止手动创建变更文件夹** → 使用 `superspec create` CLI 或 `/ss-create`
 
 ---
 
-## 🎯 Standard vs Boost
+## 🧭 基本原则
 
-| | Standard (lightweight) | Boost (enhanced) |
+| # | 原则 | 规则 |
+|---|------|------|
+| I | **上下文精简** | 每个产物不超过 300 行，硬上限 400 行。超出 → 拆分。10 分钟内可读完。 |
+| II | **信噪比** | 每句话都必须为决策提供信息。删除后无影响 → 删除。 |
+| III | **意图优于实现** | 关注 **为什么** 和 **做什么**。让 **怎么做** 在 `/ss-apply` 阶段自然涌现。 |
+| IV | **渐进式展开** | 从最小化开始。仅在需要澄清时才扩展。 |
+| V | **必要章节** | 元数据头、问题、方案、成功标准、权衡取舍。 |
+
+---
+
+## 🎯 标准模式 vs 增强模式
+
+| | 标准模式（轻量） | 增强模式（Boost） |
 |---|---|---|
-| **场景** | Simple tasks, bug fixes, small features | Large features, breaking changes, complex designs |
-| **Artifacts** | proposal + checklist + tasks | proposal + spec + checklist + tasks (+ design optional) |
+| **适用场景** | 简单任务、bug 修复、小功能 | 大型功能、破坏性变更、复杂设计 |
+| **产物** | proposal + checklist + tasks | proposal + spec + checklist + tasks（+ design 可选） |
 | **proposal 定位** | 需求 + 技术方案（自含，可直接拆 task） | 需求背景（Goals, Risks, Impact） |
 | **spec 定位** | — | 需求细节 + 交互（US/FR/AC/Edge Cases） |
 | **Checklist 时机** | proposal 后自动检查（/ 10） | spec 后自动检查（/ 25） |
-| **Task granularity** | Flexible | < 1h per task |
-| **Cross-validation** | — | Auto: US↔FR↔AC↔tasks |
-| **Edge cases** | Basic | Comprehensive |
+| **Task 粒度** | 灵活 | 每个任务 < 1 小时 |
+| **交叉验证** | — | 自动：US↔FR↔AC↔tasks |
+| **边界情况** | 基础 | 全面 |
 
 **核心流程**：
 
 ```
-Standard:  /ss-create (proposal → checklist ✓) → /ss-tasks → /ss-apply → [vibe: sync → /ss-resume] → /ss-archive
-Boost:     /ss-create -b (proposal → spec → [auto: split? design?] → checklist ✓) → /ss-tasks → /ss-apply → ...
-On-demand: /ss-clarify, /ss-checklist, /ss-lint, /ss-validate, /ss-search, /ss-link, /ss-unlink, /ss-deps
+标准模式:  /ss-create (proposal → checklist ✓) → /ss-tasks → /ss-apply → [vibe: sync → /ss-resume] → /ss-archive
+增强模式:  /ss-create -b (proposal → spec → [auto: split? design?] → checklist ✓) → /ss-tasks → /ss-apply → ...
+按需使用:  /ss-clarify, /ss-checklist, /ss-lint, /ss-validate, /ss-search, /ss-link, /ss-unlink, /ss-deps
 ```
 
 ---
 
-## 🧩 Strategy: follow vs create
+## 🧩 策略：follow vs create
 
-| | `follow` (default) | `create` (`-c` / `--creative`) |
+| | `follow`（默认） | `create`（`-c` / `--creative`） |
 |---|---|---|
-| **行为** | Read `context` files → strictly follow project rules/patterns | Aware of `context` but free to deviate with justification |
-| **Proposal** | Solution aligns with existing architecture | May propose new architecture/patterns |
-| **Spec** | Requirements fit current system design | Requirements may introduce new paradigms |
-| **Tasks** | Use existing file structure, naming, dependencies | May create new structures, suggest new dependencies |
+| **行为** | 读取 `context` 文件 → 严格遵循项目规则/模式 | 了解 `context` 但可偏离，需说明理由 |
+| **Proposal** | 方案与现有架构对齐 | 可提出新架构/模式 |
+| **Spec** | 需求适配当前系统设计 | 需求可引入新范式 |
+| **Tasks** | 使用现有文件结构、命名、依赖 | 可创建新结构、建议新依赖 |
 | **适用** | 常规功能、bug fix、遵循既有规范 | 架构重构、新模块设计、UX 创新 |
 
-### Context files
+### 上下文文件
 
-Config `context` lists files the AI should read to understand project conventions:
+配置中的 `context` 列出了 AI 应读取以了解项目约定的文件：
 
 ```json
 {
@@ -75,137 +75,137 @@ Config `context` lists files the AI should read to understand project convention
 }
 ```
 
-- **follow**: read these files → treat as constraints (must follow)
-- **create**: read these files → treat as awareness (may deviate, must justify)
-- No `context` configured? AI auto-checks: `.cursor/rules/`, `AGENTS.md`, `CONTRIBUTING.md`
-- Per-change override: add `context: ["src/auth/README.md"]` to frontmatter
+- **follow**：读取这些文件 → 视为约束（必须遵循）
+- **create**：读取这些文件 → 视为参考（可偏离，但需说明理由）
+- 未配置 `context`？AI 自动检查：`.cursor/rules/`、`AGENTS.md`、`CONTRIBUTING.md`
+- 单次变更覆盖：在 frontmatter 中添加 `context: ["src/auth/README.md"]`
 
 ---
 
-## ⚠️ Core Rules
+## ⚠️ 核心规则
 
-| Rule | Details |
-|------|---------|
-| Language | Follow `lang` config: `"zh"` → Chinese, `"en"` → English. All artifacts and interaction. |
-| Read-first | Read existing content before writing. Preserve user edits. |
-| Consistency | Boost: `US-1`, `FR-1`, `AC-1.1` must match across all artifacts. |
-| Status tracking | 🟡 Draft → 🟢 Ready → ✅ Done. Update after each step. |
+| 规则 | 说明 |
+|------|------|
+| 语言 | 遵循 `lang` 配置：`"zh"` → 中文，`"en"` → 英文。所有产物和交互均适用。 |
+| 先读后写 | 写入前先读取已有内容。保留用户编辑。 |
+| 一致性 | 增强模式下：`US-1`、`FR-1`、`AC-1.1` 必须在所有产物中保持一致。 |
+| 状态追踪 | 🟡 草稿 → 🟢 就绪 → ✅ 完成。每步后更新。 |
 
 ---
 
-## 🚫 Don't / Do
+## 🚫 禁止 / 应当
 
-| ❌ Don't | ✅ Do |
+| ❌ 禁止 | ✅ 应当 |
 |----------|------|
-| Code without planning | `/ss-create` → `/ss-tasks` → `/ss-apply` |
-| Overkill simple tasks | Use standard mode. Only boost when complexity demands it. |
-| Create folders manually | `superspec create <feature>` or `/ss-create` |
-| Ignore `clarify.md` | Read before generating/updating |
-| Overwrite user edits | Merge, don't replace |
+| 不经规划直接编码 | `/ss-create` → `/ss-tasks` → `/ss-apply` |
+| 对简单任务过度设计 | 使用标准模式。仅在复杂度需要时才用增强模式。 |
+| 手动创建文件夹 | `superspec create <feature>` 或 `/ss-create` |
+| 忽略 `clarify.md` | 生成/更新前先读取 |
+| 覆盖用户编辑 | 合并，而非替换 |
 
 ---
 
-## 🔧 Commands
+## 🔧 命令
 
-| Command | Mode | What it does |
-|---------|------|-------------|
-| `/ss-create <feature>` | Both | Create folder + branch, generate proposal (+ spec in boost), auto-run checklist gate |
-| `/ss-tasks` | Both | AI generates task list from proposal (boost: from proposal + spec) |
-| `/ss-apply` | Both | Implement tasks |
-| `/ss-clarify` | Both | Resolve ambiguity |
-| `/ss-archive` | Both | Archive completed change |
-| `/ss-checklist` | Both | Quality gate: Standard (/ 10 after proposal) or Boost (/ 25 after spec). Auto-invoked by /ss-create, also callable manually |
-| `/ss-status` | Both | View all changes |
-| `/ss-lint` | Both | Check artifact sizes |
-| `/ss-validate` | Boost | Cross-reference consistency check |
-| `/ss-search <q>` | Both | Full-text search across changes |
-| `/ss-link` | Both | Add spec dependency (`deps add`) |
-| `/ss-unlink` | Both | Remove spec dependency (`deps remove`) |
-| `/ss-deps` | Both | View dependency graph (`deps list`) |
-| `/ss-resume` | Both | Restore spec context for vibe coding (runs sync → reads context.md) |
-| `superspec sync` | Both | CLI: collect git diff into context.md (zero AI tokens) |
+| 命令 | 模式 | 功能 |
+|---------|------|------|
+| `/ss-create <feature>` | 两者 | 创建文件夹 + 分支，生成 proposal（增强模式下含 spec），自动运行 checklist 门控 |
+| `/ss-tasks` | 两者 | AI 从 proposal 生成任务列表（增强模式：从 proposal + spec） |
+| `/ss-apply` | 两者 | 实现任务 |
+| `/ss-clarify` | 两者 | 解决歧义 |
+| `/ss-archive` | 两者 | 归档已完成的变更 |
+| `/ss-checklist` | 两者 | 质量门控：标准模式（proposal 后 / 10）或增强模式（spec 后 / 25）。由 /ss-create 自动调用，也可手动调用 |
+| `/ss-status` | 两者 | 查看所有变更 |
+| `/ss-lint` | 两者 | 检查产物大小 |
+| `/ss-validate` | 增强 | 交叉引用一致性检查 |
+| `/ss-search <q>` | 两者 | 跨变更全文搜索 |
+| `/ss-link` | 两者 | 添加 spec 依赖（`deps add`） |
+| `/ss-unlink` | 两者 | 移除 spec 依赖（`deps remove`） |
+| `/ss-deps` | 两者 | 查看依赖图（`deps list`） |
+| `/ss-resume` | 两者 | 恢复 spec 上下文用于 vibe 编码（运行 sync → 读取 context.md） |
+| `superspec sync` | 两者 | CLI：将 git diff 收集到 context.md（零 AI token 消耗） |
 
 ---
 
-## 📐 Artifacts
+## 📐 产物
 
-**On-demand generation**: CLI `superspec create` only creates the folder + git branch. AI reads templates from `{specDir}/templates/` as structural reference, then generates each artifact with real content when needed — never pre-creates empty template files.
+**按需生成**：CLI `superspec create` 仅创建文件夹 + git 分支。AI 从 `{specDir}/templates/` 读取模板作为结构参考，然后在需要时生成每个产物的实际内容 — 绝不预先创建空模板文件。
 
-| Artifact | Generated by | When |
+| 产物 | 生成者 | 时机 |
 |----------|-------------|------|
-| proposal.md | `/ss-create` | Always (Standard: requirements + tech solution; Boost: requirements background) |
-| spec.md | `/ss-create -b` | Boost mode (requirement details + interactions) |
-| design.md | `/ss-create -b` | Boost mode, auto-detected when needed |
-| checklist.md | `/ss-create` (auto) | Always, after proposal (Standard) or after spec (Boost) |
-| tasks.md | `/ss-tasks` | On demand, after checklist passes |
-| clarify.md | `/ss-clarify` | On demand |
+| proposal.md | `/ss-create` | 始终（标准模式：需求 + 技术方案；增强模式：需求背景） |
+| spec.md | `/ss-create -b` | 增强模式（需求细节 + 交互） |
+| design.md | `/ss-create -b` | 增强模式，自动检测是否需要 |
+| checklist.md | `/ss-create`（自动） | 始终，proposal 后（标准模式）或 spec 后（增强模式） |
+| tasks.md | `/ss-tasks` | 按需，checklist 通过后 |
+| clarify.md | `/ss-clarify` | 按需 |
 
-**Standard:**
+**标准模式：**
 ```
 {specDir}/changes/<name>/
-├── proposal.md    — Requirements + technical solution (generated by /ss-create)
-├── checklist.md   — Quality gate / 10 (auto-generated by /ss-create)
-└── tasks.md       — Actionable steps (generated by /ss-tasks)
+├── proposal.md    — 需求 + 技术方案（由 /ss-create 生成）
+├── checklist.md   — 质量门控 / 10（由 /ss-create 自动生成）
+└── tasks.md       — 可执行步骤（由 /ss-tasks 生成）
 ```
 
-**Boost:**
+**增强模式：**
 ```
 {specDir}/changes/<name>/
-├── proposal.md    — Requirements background (generated by /ss-create -b)
-├── spec.md        — Requirement details + interactions (generated by /ss-create -b)
-├── design.md      — Architecture decisions (optional, auto-detected by /ss-create -b)
-├── checklist.md   — Quality gate / 25 (auto-generated by /ss-create -b)
-├── tasks.md       — Phased implementation steps (generated by /ss-tasks)
-└── clarify.md     — Q&A and decisions (generated by /ss-clarify)
+├── proposal.md    — 需求背景（由 /ss-create -b 生成）
+├── spec.md        — 需求细节 + 交互（由 /ss-create -b 生成）
+├── design.md      — 架构决策（可选，由 /ss-create -b 自动检测）
+├── checklist.md   — 质量门控 / 25（由 /ss-create -b 自动生成）
+├── tasks.md       — 分阶段实现步骤（由 /ss-tasks 生成）
+└── clarify.md     — 问答与决策（由 /ss-clarify 生成）
 ```
 
-**When to use design.md** (optional in boost mode):
-- Solution spans multiple systems or introduces new architectural patterns
-- Major architectural decisions with significant trade-offs
-- Need to document decision rationale before committing to specs
-- Cross-team architectural alignment required
+**何时使用 design.md**（增强模式下可选）：
+- 方案跨多个系统或引入新架构模式
+- 重大架构决策涉及显著权衡
+- 需要在确定 spec 前记录决策理由
+- 需要跨团队架构对齐
 
-**Spec deltas - Multi-capability structure** (recommended for large changes):
-When a change involves multiple distinct capabilities, split specs by capability domain:
+**Spec 增量 - 多能力结构**（大型变更推荐）：
+当变更涉及多个独立能力时，按能力领域拆分 spec：
 
 ```
 {specDir}/changes/<name>/
 ├── proposal.md
 ├── design.md
 ├── specs/
-│   ├── auth/              — Authentication capability
+│   ├── auth/              — 认证能力
 │   │   └── spec.md
-│   ├── api/               — API layer capability
+│   ├── api/               — API 层能力
 │   │   └── spec.md
-│   └── ui/                — UI components capability
+│   └── ui/                — UI 组件能力
 │       └── spec.md
 ├── tasks.md
 └── checklist.md
 ```
 
-**Benefits of capability-based splitting**:
-- Each spec.md stays under 300-line target
-- Clear separation of concerns
-- Easier parallel review and implementation
-- Better traceability for cross-references
+**基于能力拆分的优势**：
+- 每个 spec.md 保持在 300 行目标内
+- 关注点清晰分离
+- 更易并行审查和实现
+- 交叉引用可追溯性更好
 
-Each artifact has YAML frontmatter: `name`, `status`, `strategy`, `depends_on: []`, `input` (proposal.md only, records user's original input).
+每个产物包含 YAML frontmatter：`name`、`status`、`strategy`、`depends_on: []`、`input`（仅 proposal.md，记录用户原始输入）。
 
-**Strategy priority** (highest to lowest): user input `-c` > `superspec.config.json` default.
+**策略优先级**（从高到低）：用户输入 `-c` > `superspec.config.json` 默认值。
 
 ---
 
-## ⚙️ Config
+## ⚙️ 配置
 
-| Field | Default | Purpose |
-|-------|---------|---------|
-| `lang` | `"zh"` | Artifact language |
-| `specDir` | `"superspec"` | Spec folder |
-| `branchPrefix` | `"spec/"` | Git branch prefix |
-| `boost` | `false` | Enable boost mode |
-| `strategy` | `"follow"` | `follow` = obey project rules, `create` = explore freely |
-| `context` | `[]` | Files AI should read for project conventions |
-| `limits.targetLines` | `300` | Target max lines per artifact |
-| `limits.hardLines` | `400` | Hard max lines per artifact |
+| 字段 | 默认值 | 用途 |
+|-------|---------|------|
+| `lang` | `"zh"` | 产物语言 |
+| `specDir` | `"superspec"` | Spec 文件夹 |
+| `branchPrefix` | `"spec/"` | Git 分支前缀 |
+| `boost` | `false` | 启用增强模式 |
+| `strategy` | `"follow"` | `follow` = 遵循项目规则，`create` = 自由探索 |
+| `context` | `[]` | AI 应读取的项目约定文件 |
+| `limits.targetLines` | `300` | 每个产物的目标最大行数 |
+| `limits.hardLines` | `400` | 每个产物的硬性最大行数 |
 
 <!-- superspec:end -->
