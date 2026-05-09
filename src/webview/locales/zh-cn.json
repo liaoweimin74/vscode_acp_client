@@ -22,6 +22,7 @@
 	"command.help": "显示可用命令",
 	"command.sessions": "切换会话",
 	"command.models": "切换模型",
+	"command.mcps": "管理 MCP 服务器",
 	"command.think": "设置思考级别",
 	"command.clear": "清除对话",
 	"command.agent": "切换代理",
@@ -61,6 +62,9 @@
 	"model.model": "模型",
 	"model.notAvailable": "模型选择不可用",
 
+	"mcp.title": "MCP 服务器",
+	"mcp.noServers": "暂无 MCP 服务器",
+
 	"tool.read": "读取",
 	"tool.edit": "编辑",
 	"tool.delete": "删除",
@@ -87,6 +91,10 @@
 	"message.tokens": "令牌",
 	"message.user": "用户",
 	"message.noMessages": "暂无消息",
+	"message.showAnswer": "显示回答",
+	"message.hideAnswer": "隐藏回答",
+	"message.expandAnswer": "展开回答",
+	"message.collapseAnswer": "折叠回答",
 
 	"config.think": "思考",
 	"config.role": "角色",

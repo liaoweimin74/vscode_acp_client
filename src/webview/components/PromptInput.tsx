@@ -1,37 +1,66 @@
 import type { MentionItem } from "@shared/types/extension";
 import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 import { postMessage } from "../api/vscode";
+import { t } from "../i18n";
 import { useStore } from "../store";
 import {
-	selInputText, selSetInputText, selSendMessage, selIsStreaming,
-	selIsCommandMenuOpen, selSetCommandMenuOpen, selCancelPrompt,
-	selEscCancelTimer, selSetEscCancelTimer, selQueuedPrompts,
-	selSendQueuedPromptNow, selActiveSession, selConnectionError,
-	selReconnectFailed, selReconnectAgent, selSlashCommands,
-	selAgentRoles, selMentionMenuOpen, selSetMentionMenuOpen,
-	selOpenCommandPopup, selRemoveQueuedPrompt, selPastedSnippets,
-	selRemovePastedSnippet, selActiveAgent, selAgents,
-	selAttachments, selRemoveAttachment,
+	selActiveAgent,
+	selActiveSession,
+	selAgentRoles,
+	selAgents,
+	selAttachments,
+	selCancelPrompt,
+	selConnectionError,
+	selEscCancelTimer,
+	selInputText,
+	selIsCommandMenuOpen,
+	selIsStreaming,
+	selMentionMenuOpen,
+	selOpenCommandPopup,
+	selPastedSnippets,
+	selQueuedPrompts,
+	selReconnectAgent,
+	selReconnectFailed,
+	selRemoveAttachment,
+	selRemovePastedSnippet,
+	selRemoveQueuedPrompt,
+	selSendMessage,
+	selSendQueuedPromptNow,
+	selSetCommandMenuOpen,
+	selSetEscCancelTimer,
+	selSetInputText,
+	selSetMentionMenuOpen,
+	selSlashCommands,
 } from "../store/selectors";
 import { MentionMenu } from "./MentionMenu";
 import { SlashCommandMenu } from "./SlashCommandMenu";
-import { t } from "../i18n";
 import "./PromptInput.css";
 
 const DEFAULT_COMMANDS = [
 	{ name: "/help", description: t("command.help") },
 	{ name: "/sessions", description: t("command.sessions") },
 	{ name: "/models", description: t("command.models") },
+	{ name: "/mcps", description: t("command.mcps") },
 	{ name: "/think", description: t("command.think") },
 	{ name: "/clear", description: t("command.clear") },
 	{ name: "/agent", description: t("command.agent") },
 ];
 
-const BUILTIN_COMMANDS = new Set(["sessions", "models"]);
+const BUILTIN_COMMANDS = new Set(["sessions", "models", "mcps"]);
 
 const BROWSE_ACTIONS: MentionItem[] = [
-	{ type: "action", action: "browse-files", name: t("mention.browseFiles"), description: t("mention.attachFiles") },
-	{ type: "action", action: "browse-folders", name: t("mention.browseFolders"), description: t("mention.attachDirectories") },
+	{
+		type: "action",
+		action: "browse-files",
+		name: t("mention.browseFiles"),
+		description: t("mention.attachFiles"),
+	},
+	{
+		type: "action",
+		action: "browse-folders",
+		name: t("mention.browseFolders"),
+		description: t("mention.attachDirectories"),
+	},
 ];
 
 /** Extract the @ mention query from text at cursor position */
@@ -130,17 +159,22 @@ export function PromptInput() {
 			const command = spaceIdx === -1 ? trimmed.slice(1) : trimmed.slice(1, spaceIdx);
 			const args = spaceIdx === -1 ? "" : trimmed.slice(spaceIdx + 1);
 			if (BUILTIN_COMMANDS.has(command)) {
-				openCommandPopup(command as "sessions" | "models");
+				openCommandPopup(command as "sessions" | "models" | "mcps");
 				setInputText("");
 				setCommandMenuOpen(false);
 				return;
 			}
 			if (isStreaming) {
 				const { queuedPrompts: qp, pastedSnippets: ps } = useStore.getState();
-				const fullPrompt = ps.length > 0
-					? (trimmed || "") + "\n<clipboard>\n" + ps.map((s) => s.fullText).join("\n") + "\n</clipboard>"
-					: trimmed;
-				useStore.setState({ queuedPrompts: [...qp, fullPrompt], inputText: "", pastedSnippets: [] });
+				const fullPrompt =
+					ps.length > 0
+						? `${trimmed || ""}\n<clipboard>\n${ps.map((s) => s.fullText).join("\n")}\n</clipboard>`
+						: trimmed;
+				useStore.setState({
+					queuedPrompts: [...qp, fullPrompt],
+					inputText: "",
+					pastedSnippets: [],
+				});
 				return;
 			}
 			postMessage({ type: "slash_command", command, args });
@@ -174,7 +208,7 @@ export function PromptInput() {
 			const insert = `@${item.name} `;
 			useStore.getState().setInputText(before + insert + after);
 		} else {
-			useStore.getState().setInputText(currentInputText + `@${item.name} `);
+			useStore.getState().setInputText(`${currentInputText}@${item.name} `);
 		}
 		useStore.getState().setMentionMenuOpen(false);
 		textareaRef.current?.focus();
@@ -256,7 +290,9 @@ export function PromptInput() {
 
 	const activeAgent = useStore(selActiveAgent);
 	const agents = useStore(selAgents);
-	const connectedAgent = agents.find((a) => a.config.id === activeAgent && a.status === "connected");
+	const connectedAgent = agents.find(
+		(a) => a.config.id === activeAgent && a.status === "connected",
+	);
 	const isDisabled = !connectedAgent || !!connectionError;
 	const placeholder = connectionError
 		? t("prompt.placeholder.connectionError", connectionError)
@@ -364,12 +400,26 @@ export function PromptInput() {
 			{attachments.length > 0 && (
 				<div className="acp-prompt__attachments">
 					{attachments.map((att, i) => (
-						<div key={`att-${i}-${att.path}`} className="acp-prompt__attachment-chip" title={att.path}>
+						<div
+							key={`att-${i}-${att.path}`}
+							className="acp-prompt__attachment-chip"
+							title={att.path}
+						>
 							<svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
 								{att.isDirectory ? (
-									<path d="M1 3h5l2 2h7v9H1V3z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+									<path
+										d="M1 3h5l2 2h7v9H1V3z"
+										stroke="currentColor"
+										strokeWidth="1.2"
+										strokeLinejoin="round"
+									/>
 								) : (
-									<path d="M4 1h5l4 4v9H4V1z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+									<path
+										d="M4 1h5l4 4v9H4V1z"
+										stroke="currentColor"
+										strokeWidth="1.2"
+										strokeLinejoin="round"
+									/>
 								)}
 							</svg>
 							<span className="acp-prompt__attachment-name">{att.name}</span>
@@ -381,7 +431,12 @@ export function PromptInput() {
 								aria-label={t("prompt.removeAttachment")}
 							>
 								<svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-									<path d="M2 2L8 8M8 2L2 8" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+									<path
+										d="M2 2L8 8M8 2L2 8"
+										stroke="currentColor"
+										strokeWidth="1"
+										strokeLinecap="round"
+									/>
 								</svg>
 							</button>
 						</div>
@@ -393,12 +448,11 @@ export function PromptInput() {
 					{pastedSnippets.map((snippet, i) => {
 						const isExpanded = expandedSnippets.has(snippet.id);
 						return (
-							<div
+							<button
 								key={snippet.id}
+								type="button"
 								className={`acp-prompt__snippet-chip${isExpanded ? " acp-prompt__snippet-chip--expanded" : ""}`}
 								onClick={() => toggleSnippetExpand(snippet.id)}
-								role="button"
-								tabIndex={0}
 								aria-expanded={isExpanded}
 							>
 								{isExpanded ? (
@@ -406,21 +460,36 @@ export function PromptInput() {
 								) : (
 									<>
 										<span className="acp-prompt__snippet-preview">{snippet.preview}...</span>
-										<span className="acp-prompt__snippet-count">{t("prompt.chars", snippet.charCount)}</span>
+										<span className="acp-prompt__snippet-count">
+											{t("prompt.chars", snippet.charCount)}
+										</span>
 									</>
 								)}
-								<button
-									type="button"
+								<div
 									className="acp-prompt__attachment-remove"
-									onClick={(e) => { e.stopPropagation(); removePastedSnippet(i); }}
-								title={t("prompt.removeSnippet")}
-								aria-label={t("prompt.removeTextSnippet")}
+									onClick={(e) => {
+										e.stopPropagation();
+										removePastedSnippet(i);
+									}}
+									onKeyDown={(e) => {
+										if (e.key === "Enter" || e.key === " ") {
+											e.stopPropagation();
+											removePastedSnippet(i);
+										}
+									}}
+									title={t("prompt.removeSnippet")}
+									aria-label={t("prompt.removeTextSnippet")}
 								>
 									<svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-										<path d="M2 2L8 8M8 2L2 8" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+										<path
+											d="M2 2L8 8M8 2L2 8"
+											stroke="currentColor"
+											strokeWidth="1"
+											strokeLinecap="round"
+										/>
 									</svg>
-								</button>
-							</div>
+								</div>
+							</button>
 						);
 					})}
 				</div>
@@ -442,7 +511,9 @@ export function PromptInput() {
 					type="button"
 					className="acp-prompt__send"
 					onClick={handleSend}
-					disabled={(!inputText.trim() && pastedSnippets.length === 0) || !activeAgent || !!connectionError}
+					disabled={
+						(!inputText.trim() && pastedSnippets.length === 0) || !activeAgent || !!connectionError
+					}
 					title={isStreaming ? t("prompt.queueMessage") : t("prompt.sendMessage")}
 					aria-label={isStreaming ? t("prompt.queueMessageShort") : t("prompt.sendMessageShort")}
 				>

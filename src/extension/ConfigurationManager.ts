@@ -1,17 +1,23 @@
 import * as vscode from "vscode";
 import type { AgentConfig } from "../shared/types/acp.js";
+import type { McpServerEntry } from "../shared/types/extension.js";
 
 const SECTION = "vscodeAcp";
 
 export class ConfigurationManager implements vscode.Disposable {
 	private readonly _onDidChangeAgents = new vscode.EventEmitter<AgentConfig[]>();
 	readonly onDidChangeAgents = this._onDidChangeAgents.event;
+	private readonly _onDidChangeMcpServers = new vscode.EventEmitter<McpServerEntry[]>();
+	readonly onDidChangeMcpServers = this._onDidChangeMcpServers.event;
 	private readonly listener: vscode.Disposable;
 
 	constructor() {
 		this.listener = vscode.workspace.onDidChangeConfiguration((e) => {
 			if (e.affectsConfiguration(`${SECTION}.agents`)) {
 				this._onDidChangeAgents.fire(this.getAgentConfigs());
+			}
+			if (e.affectsConfiguration(`${SECTION}.mcpServers`)) {
+				this._onDidChangeMcpServers.fire(this.getMcpServerConfigs());
 			}
 		});
 	}
@@ -28,6 +34,18 @@ export class ConfigurationManager implements vscode.Disposable {
 		return configs;
 	}
 
+	getMcpServerConfigs(): McpServerEntry[] {
+		const raw = vscode.workspace.getConfiguration(SECTION).get<unknown[]>("mcpServers", []);
+		const servers: McpServerEntry[] = [];
+		for (const item of raw) {
+			const s = item as McpServerEntry;
+			if (s.name && s.type) {
+				servers.push({ ...s, enabled: s.enabled ?? true });
+			}
+		}
+		return servers;
+	}
+
 	getDefaultAgent(): string {
 		return vscode.workspace.getConfiguration(SECTION).get<string>("defaultAgent", "");
 	}
@@ -39,5 +57,6 @@ export class ConfigurationManager implements vscode.Disposable {
 	dispose(): void {
 		this.listener.dispose();
 		this._onDidChangeAgents.dispose();
+		this._onDidChangeMcpServers.dispose();
 	}
 }

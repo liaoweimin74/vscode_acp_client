@@ -20,5 +20,12 @@
   "configuration.agents.env.description": "环境变量",
   "configuration.defaultAgent.description": "启动时使用的默认代理 ID",
   "configuration.theme.description": "UI 主题（auto 跟随 VSCode 主题）",
-  "configuration.logLevel.description": "ACP 代理输出通道的日志级别"
+  "configuration.logLevel.description": "ACP 代理输出通道的日志级别",
+  "configuration.mcpServers.description": "MCP（模型上下文协议）服务器配置列表，用于连接到代理会话",
+  "configuration.mcpServers.name.description": "MCP 服务器的可读名称",
+  "configuration.mcpServers.type.description": "传输类型：http、sse 或 stdio",
+  "configuration.mcpServers.url.description": "http/sse 类型服务器的 URL",
+  "configuration.mcpServers.command.description": "stdio 类型服务器的可执行命令",
+  "configuration.mcpServers.args.description": "stdio 类型服务器的命令参数",
+  "configuration.mcpServers.enabled.description": "是否为新会话启用此 MCP 服务器"
 }

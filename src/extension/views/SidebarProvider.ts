@@ -338,6 +338,16 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 				this.bridge.postMessage({ type: "file_dialog_result", files });
 				break;
 			}
+			case "toggle_mcp_server": {
+				const mcpName = msg.name as string;
+				const mcpEnabled = msg.enabled as boolean;
+				const mcpAgentId = this.state.activeAgent;
+				const mcpConn = mcpAgentId ? this.registry.get(mcpAgentId) : undefined;
+				if (mcpConn?.isConnected) {
+					mcpConn.toggleMcpServer(mcpName, mcpEnabled);
+				}
+				break;
+			}
 		}
 	}
 

@@ -11,7 +11,12 @@ export interface AgentRole {
 export type MentionItem =
 	| { type: "role"; id: string; name: string; description?: string }
 	| { type: "tool"; kind: string; name: string; description: string }
-	| { type: "action"; action: "browse-files" | "browse-folders"; name: string; description: string };
+	| {
+			type: "action";
+			action: "browse-files" | "browse-folders";
+			name: string;
+			description: string;
+	  };
 
 export interface FileAttachment {
 	path: string;
@@ -119,17 +124,28 @@ export interface ToolCallData {
 	locations?: ToolCallLocation[];
 }
 
+export interface McpServerEntry {
+	name: string;
+	type: "http" | "sse" | "stdio";
+	url?: string;
+	command?: string;
+	args?: string[];
+	enabled: boolean;
+}
+
 export type ExtensionMessage =
 	| { type: "state_update"; state: ExtensionState }
 	| { type: "session_messages"; sessionId: string; messages: Message[] }
 	| { type: "stream_chunk"; sessionId: string; chunk: MessageChunkData }
+	| { type: "stream_start"; sessionId: string }
 	| { type: "stream_end"; sessionId: string; durationMs?: number; modelName?: string }
 	| { type: "session_update"; sessionId: string; update: SessionUpdate }
 	| { type: "agent_reconnecting"; attempt: number }
 	| { type: "agent_reconnect_failed" }
-	| { type: "open_command_popup"; popup: "sessions" | "models" }
+	| { type: "open_command_popup"; popup: "sessions" | "models" | "mcps" }
 	| { type: "role_update"; agentRoles: AgentRole[]; activeRole: string | null }
-	| { type: "file_dialog_result"; files: FileAttachment[] };
+	| { type: "file_dialog_result"; files: FileAttachment[] }
+	| { type: "mcp_servers_update"; servers: McpServerEntry[] };
 
 export type WebviewMessage =
 	| { type: "select_agent"; agentId: string }
@@ -143,4 +159,5 @@ export type WebviewMessage =
 	| { type: "delete_session"; sessionId: string }
 	| { type: "clear_empty_sessions" }
 	| { type: "switch_role"; roleId: string }
-	| { type: "pick_files"; canSelectFiles: boolean; canSelectFolders: boolean };
+	| { type: "pick_files"; canSelectFiles: boolean; canSelectFolders: boolean }
+	| { type: "toggle_mcp_server"; name: string; enabled: boolean };

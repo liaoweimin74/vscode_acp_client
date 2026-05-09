@@ -22,6 +22,7 @@
 	"command.help": "顯示可用命令",
 	"command.sessions": "切換工作階段",
 	"command.models": "切換模型",
+	"command.mcps": "管理 MCP 伺服器",
 	"command.think": "設定思考層級",
 	"command.clear": "清除對話",
 	"command.agent": "切換代理",
@@ -61,6 +62,9 @@
 	"model.model": "模型",
 	"model.notAvailable": "模型選擇不可用",
 
+	"mcp.title": "MCP 伺服器",
+	"mcp.noServers": "暫無 MCP 伺服器",
+
 	"tool.read": "讀取",
 	"tool.edit": "編輯",
 	"tool.delete": "刪除",
@@ -87,6 +91,10 @@
 	"message.tokens": "權杖",
 	"message.user": "使用者",
 	"message.noMessages": "暫無訊息",
+	"message.showAnswer": "顯示回答",
+	"message.hideAnswer": "隱藏回答",
+	"message.expandAnswer": "展開回答",
+	"message.collapseAnswer": "摺疊回答",
 
 	"config.think": "思考",
 	"config.role": "角色",

@@ -20,5 +20,12 @@
   "configuration.agents.env.description": "Environment variables",
   "configuration.defaultAgent.description": "Default agent ID to use on startup",
   "configuration.theme.description": "UI theme (auto follows VSCode theme)",
-  "configuration.logLevel.description": "Log level for the ACP Agent output channel"
+  "configuration.logLevel.description": "Log level for the ACP Agent output channel",
+  "configuration.mcpServers.description": "List of MCP (Model Context Protocol) server configurations to connect to agent sessions",
+  "configuration.mcpServers.name.description": "Human-readable name identifying this MCP server",
+  "configuration.mcpServers.type.description": "Transport type: http, sse, or stdio",
+  "configuration.mcpServers.url.description": "URL for http/sse type servers",
+  "configuration.mcpServers.command.description": "Executable command for stdio type servers",
+  "configuration.mcpServers.args.description": "Command arguments for stdio type servers",
+  "configuration.mcpServers.enabled.description": "Whether this MCP server is enabled for new sessions"
 }

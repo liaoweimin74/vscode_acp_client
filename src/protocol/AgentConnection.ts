@@ -1,10 +1,10 @@
-import { ChildProcess, spawn } from "node:child_process";
-import type { Client, InitializeResponse } from "@agentclientprotocol/sdk";
+import { type ChildProcess, spawn } from "node:child_process";
+import type { Client, InitializeResponse, McpServer } from "@agentclientprotocol/sdk";
 import { ClientSideConnection, ndJsonStream } from "@agentclientprotocol/sdk";
-import type { AgentConfig, AgentConnectionState, Session } from "../shared/types/acp.js";
-import type { FileAttachment } from "../shared/types/extension.js";
-import { EventEmitter } from "../shared/EventEmitter.js";
 import { Logger } from "../extension/Logger.js";
+import { EventEmitter } from "../shared/EventEmitter.js";
+import type { AgentConfig, AgentConnectionState, Session } from "../shared/types/acp.js";
+import type { FileAttachment, McpServerEntry } from "../shared/types/extension.js";
 
 interface AgentConnectionEvents {
 	stateChanged: AgentConnectionState;
@@ -14,7 +14,7 @@ interface AgentConnectionEvents {
 	configChanged: { sessionId: string; options: unknown[] };
 	error: Error;
 	reconnecting: { attempt: number };
-	reconnectFailed: void;
+	reconnectFailed: undefined;
 }
 
 export class AgentConnection extends EventEmitter<AgentConnectionEvents> {
@@ -30,7 +30,20 @@ export class AgentConnection extends EventEmitter<AgentConnectionEvents> {
 	private _reconnectAttempts = 0;
 	private _reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 	private _pendingSessionId: string | null = null;
+	private _mcpServers: McpServerEntry[] = [];
 	private log = Logger.getInstance();
+
+	get mcpServers(): McpServerEntry[] {
+		return this._mcpServers;
+	}
+
+	toggleMcpServer(name: string, enabled: boolean): void {
+		this._mcpServers = this._mcpServers.map((s) => (s.name === name ? { ...s, enabled } : s));
+	}
+
+	updateMcpServers(servers: McpServerEntry[]): void {
+		this._mcpServers = servers;
+	}
 
 	get state(): AgentConnectionState {
 		return this._state;
@@ -63,9 +76,10 @@ export class AgentConnection extends EventEmitter<AgentConnectionEvents> {
 		}
 	}
 
-	constructor(config: AgentConfig) {
+	constructor(config: AgentConfig, mcpServers?: McpServerEntry[]) {
 		super();
 		this.config = config;
+		this._mcpServers = mcpServers ?? [];
 	}
 
 	async connect(): Promise<InitializeResponse> {
@@ -191,7 +205,9 @@ export class AgentConnection extends EventEmitter<AgentConnectionEvents> {
 				const { code, signal } = this._initExited;
 				const reason = signal
 					? `killed by signal ${signal}`
-					: code !== null ? `exited with code ${code}` : "exited unexpectedly";
+					: code !== null
+						? `exited with code ${code}`
+						: "exited unexpectedly";
 				throw new Error(
 					`Agent "${this.config.command}" ${reason}. Check that the command is correct and the agent is installed.`,
 				);
@@ -203,9 +219,10 @@ export class AgentConnection extends EventEmitter<AgentConnectionEvents> {
 	async createSession(cwd: string): Promise<Session> {
 		this.assertConnected();
 
-		const response = await this.connection!.newSession({
+		const mcpServers = this.buildMcpServers();
+		const response = await this.connection?.newSession({
 			cwd,
-			mcpServers: [],
+			mcpServers,
 		});
 
 		this.log.debug("newSession response received");
@@ -220,7 +237,9 @@ export class AgentConnection extends EventEmitter<AgentConnectionEvents> {
 			status: "idle",
 		};
 
-		this.log.debug(`created session: ${session.id}, configOptions: ${session.configOptions?.length}, models: ${session.models}, modes: ${JSON.stringify(session.modes)}`);
+		this.log.debug(
+			`created session: ${session.id}, configOptions: ${session.configOptions?.length}, models: ${session.models}, modes: ${JSON.stringify(session.modes)}`,
+		);
 		this.log.debug(`raw newSession response modes: ${JSON.stringify(response.modes)}`);
 
 		this.sessions.set(session.id, session);
@@ -237,13 +256,15 @@ export class AgentConnection extends EventEmitter<AgentConnectionEvents> {
 			return [];
 		}
 
-		const response = await this.connection!.listSessions({
+		const response = await this.connection?.listSessions({
 			cwd,
 		});
 
-		console.log("[ACP-DEBUG] listSessions: returned " + response.sessions.length + " sessions");
+		console.log(`[ACP-DEBUG] listSessions: returned ${response.sessions.length} sessions`);
 		for (const s of response.sessions) {
-			console.log("[ACP-DEBUG]   session: id=" + s.sessionId + " title=" + s.title + " cwd=" + s.cwd + " updatedAt=" + s.updatedAt);
+			console.log(
+				`[ACP-DEBUG]   session: id=${s.sessionId} title=${s.title} cwd=${s.cwd} updatedAt=${s.updatedAt}`,
+			);
 		}
 		return response.sessions;
 	}
@@ -251,7 +272,7 @@ export class AgentConnection extends EventEmitter<AgentConnectionEvents> {
 	async resumeSession(sessionId: string, cwd: string) {
 		this.assertConnected();
 
-		const response = await this.connection!.resumeSession({
+		const response = await this.connection?.resumeSession({
 			sessionId,
 			cwd,
 		});
@@ -281,13 +302,16 @@ export class AgentConnection extends EventEmitter<AgentConnectionEvents> {
 	async loadSession(sessionId: string, cwd: string) {
 		this.assertConnected();
 
-		const response = await this.connection!.loadSession({
+		const mcpServers = this.buildMcpServers();
+		const response = await this.connection?.loadSession({
 			sessionId,
 			cwd,
-			mcpServers: [],
+			mcpServers,
 		});
 
-		console.log("[ACP-DEBUG] loadSession: sessionId=" + sessionId + " configOptions=" + (response.configOptions?.length ?? 0) + " modes=" + (response.modes?.availableModes?.length ?? 0) + " models=" + (response.models?.availableModels?.length ?? 0));
+		console.log(
+			`[ACP-DEBUG] loadSession: sessionId=${sessionId} configOptions=${response.configOptions?.length ?? 0} modes=${response.modes?.availableModes?.length ?? 0} models=${response.models?.availableModels?.length ?? 0}`,
+		);
 
 		const session: Session = {
 			id: sessionId,
@@ -303,10 +327,29 @@ export class AgentConnection extends EventEmitter<AgentConnectionEvents> {
 		return session;
 	}
 
+	private buildMcpServers(): McpServer[] {
+		return this._mcpServers
+			.filter((s) => s.enabled)
+			.map((s): McpServer => {
+				if (s.type === "http") {
+					return { type: "http", name: s.name, url: s.url ?? "", headers: [] };
+				}
+				if (s.type === "sse") {
+					return { type: "sse", name: s.name, url: s.url ?? "", headers: [] };
+				}
+				return {
+					name: s.name,
+					command: s.command ?? "",
+					args: s.args ?? [],
+					env: [],
+				};
+			});
+	}
+
 	async closeSession(sessionId: string) {
 		this.assertConnected();
 
-		await this.connection!.closeSession({ sessionId });
+		await this.connection?.closeSession({ sessionId });
 		this.sessions.delete(sessionId);
 		this.emit("sessionClosed", sessionId);
 	}
@@ -319,9 +362,7 @@ export class AgentConnection extends EventEmitter<AgentConnectionEvents> {
 			session.status = "active";
 		}
 
-		const contentBlocks: Array<Record<string, unknown>> = [
-			{ type: "text", text: message },
-		];
+		const contentBlocks: Array<Record<string, unknown>> = [{ type: "text", text: message }];
 
 		if (attachments && attachments.length > 0) {
 			const promptCapabilities = this._state.agentInfo?.agentCapabilities?.promptCapabilities;
@@ -371,7 +412,7 @@ export class AgentConnection extends EventEmitter<AgentConnectionEvents> {
 				prompt: contentBlocks,
 			};
 			this.log.debug(`prompt() sending: ${JSON.stringify(promptParams)}`);
-			const response = await this.connection!.prompt(promptParams);
+			const response = await this.connection?.prompt(promptParams);
 			this.log.debug("prompt() response received");
 
 			if (session) {
@@ -391,7 +432,7 @@ export class AgentConnection extends EventEmitter<AgentConnectionEvents> {
 	async cancel(sessionId: string) {
 		this.assertConnected();
 
-		await this.connection!.cancel({ sessionId });
+		await this.connection?.cancel({ sessionId });
 	}
 
 	async setConfigOption(sessionId: string, configId: string, value: string | boolean) {
@@ -404,7 +445,7 @@ export class AgentConnection extends EventEmitter<AgentConnectionEvents> {
 
 		this.log.debug(`setConfigOption() sending: ${JSON.stringify(request)}`);
 		try {
-			const response = await this.connection!.setSessionConfigOption(request);
+			const response = await this.connection?.setSessionConfigOption(request);
 			this.log.debug(`setConfigOption() response: ${JSON.stringify(response)}`);
 
 			const session = this.sessions.get(sessionId);
@@ -424,7 +465,7 @@ export class AgentConnection extends EventEmitter<AgentConnectionEvents> {
 	async setSessionMode(sessionId: string, modeId: string) {
 		this.assertConnected();
 
-		await this.connection!.setSessionMode({
+		await this.connection?.setSessionMode({
 			sessionId,
 			modeId,
 		});
@@ -453,7 +494,7 @@ export class AgentConnection extends EventEmitter<AgentConnectionEvents> {
 
 		this._reconnecting = true;
 		this._reconnectAttempts++;
-		const delay = Math.pow(2, this._reconnectAttempts - 1) * 1000;
+		const delay = 2 ** (this._reconnectAttempts - 1) * 1000;
 		this.log.info(`Reconnecting attempt ${this._reconnectAttempts}/${maxRetries} in ${delay}ms`);
 		this.emit("reconnecting", { attempt: this._reconnectAttempts });
 

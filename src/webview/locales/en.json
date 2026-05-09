@@ -22,6 +22,7 @@
 	"command.help": "Show available commands",
 	"command.sessions": "Switch session",
 	"command.models": "Switch model",
+	"command.mcps": "Manage MCP servers",
 	"command.think": "Set thought level",
 	"command.clear": "Clear conversation",
 	"command.agent": "Switch agent",
@@ -61,6 +62,9 @@
 	"model.model": "Model",
 	"model.notAvailable": "Model selection not available",
 
+	"mcp.title": "MCP Servers",
+	"mcp.noServers": "No MCP servers available",
+
 	"tool.read": "Read",
 	"tool.edit": "Edit",
 	"tool.delete": "Delete",
@@ -87,6 +91,10 @@
 	"message.tokens": "tokens",
 	"message.user": "User",
 	"message.noMessages": "No messages yet",
+	"message.showAnswer": "Show answer",
+	"message.hideAnswer": "Hide answer",
+	"message.expandAnswer": "Expand answer",
+	"message.collapseAnswer": "Collapse answer",
 
 	"config.think": "Think",
 	"config.role": "Role",

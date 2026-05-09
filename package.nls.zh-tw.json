@@ -20,5 +20,12 @@
   "configuration.agents.env.description": "環境變數",
   "configuration.defaultAgent.description": "啟動時使用的預設代理 ID",
   "configuration.theme.description": "UI 主題（auto 跟隨 VSCode 主題）",
-  "configuration.logLevel.description": "ACP 代理輸出通道的日誌層級"
+  "configuration.logLevel.description": "ACP 代理輸出通道的日誌層級",
+  "configuration.mcpServers.description": "MCP（模型上下文協定）伺服器設定清單，用於連接到代理工作階段",
+  "configuration.mcpServers.name.description": "MCP 伺服器的可讀名稱",
+  "configuration.mcpServers.type.description": "傳輸類型：http、sse 或 stdio",
+  "configuration.mcpServers.url.description": "http/sse 類型伺服器的 URL",
+  "configuration.mcpServers.command.description": "stdio 類型伺服器的可執行命令",
+  "configuration.mcpServers.args.description": "stdio 類型伺服器的命令引數",
+  "configuration.mcpServers.enabled.description": "是否為新工作階段啟用此 MCP 伺服器"
 }

@@ -1,14 +1,14 @@
 import * as vscode from "vscode";
 import { AgentConnection } from "../protocol/AgentConnection.js";
 import { AgentRegistry } from "../protocol/AgentRegistry.js";
-import { StateManager } from "./StateManager.js";
 import { ConfigurationManager } from "./ConfigurationManager.js";
-import { WebviewBridge } from "./WebviewBridge.js";
-import { SidebarProvider } from "./views/SidebarProvider.js";
-import { StatusBar } from "./views/StatusBar.js";
-import { registerCommands } from "./commands/index.js";
 import { Logger } from "./Logger.js";
 import { SlashCommandRegistry } from "./SlashCommandRegistry.js";
+import { StateManager } from "./StateManager.js";
+import { WebviewBridge } from "./WebviewBridge.js";
+import { registerCommands } from "./commands/index.js";
+import { SidebarProvider } from "./views/SidebarProvider.js";
+import { StatusBar } from "./views/StatusBar.js";
 
 let registry: AgentRegistry;
 let stateManager: StateManager;
@@ -92,14 +92,33 @@ export function activate(context: vscode.ExtensionContext) {
 			bridge.postMessage({
 				type: "session_update",
 				sessionId: stateManager.activeSession ?? "",
+				// biome-ignore format: inline import type assertion cannot be split across lines
 				update: { sessionUpdate: "clear_conversation" } as unknown as import("../shared/types/acp.js").SessionUpdate,
 			});
 		},
 	});
 
+	slashRegistry.register({
+		name: "mcps",
+		description: vscode.l10n.t("Manage MCP servers"),
+		builtin: true,
+		execute: async () => {
+			const servers = configManager.getMcpServerConfigs();
+			bridge.postMessage({
+				type: "mcp_servers_update",
+				servers,
+			});
+			bridge.postMessage({
+				type: "open_command_popup",
+				popup: "mcps",
+			});
+		},
+	});
+
+	const mcpServers = configManager.getMcpServerConfigs();
 	const agentConfigs = configManager.getAgentConfigs();
 	for (const cfg of agentConfigs) {
-		registry.add(new AgentConnection(cfg));
+		registry.add(new AgentConnection(cfg, mcpServers));
 	}
 
 	const defaultAgent = configManager.getDefaultAgent();
@@ -113,6 +132,7 @@ export function activate(context: vscode.ExtensionContext) {
 	configManager.onDidChangeAgents((configs) => {
 		const existingIds = new Set(registry.getAll().map((c) => c.config.id));
 		const newIds = new Set(configs.map((c) => c.id));
+		const mcpServers = configManager.getMcpServerConfigs();
 
 		for (const id of existingIds) {
 			if (!newIds.has(id)) {
@@ -122,12 +142,26 @@ export function activate(context: vscode.ExtensionContext) {
 
 		for (const cfg of configs) {
 			if (!existingIds.has(cfg.id)) {
-				registry.add(new AgentConnection(cfg));
+				registry.add(new AgentConnection(cfg, mcpServers));
 			}
 		}
 	});
 
-	const sidebarProvider = new SidebarProvider(context.extensionUri, bridge, stateManager, registry, slashRegistry, context.globalStorageUri, configManager);
+	configManager.onDidChangeMcpServers((servers) => {
+		for (const conn of registry.getAll()) {
+			conn.updateMcpServers(servers);
+		}
+	});
+
+	const sidebarProvider = new SidebarProvider(
+		context.extensionUri,
+		bridge,
+		stateManager,
+		registry,
+		slashRegistry,
+		context.globalStorageUri,
+		configManager,
+	);
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider(SidebarProvider.viewType, sidebarProvider, {
 			webviewOptions: { retainContextWhenHidden: true },
@@ -144,15 +178,25 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	registry.on("configChanged", (event) => {
-		stateManager.setConfigOptions(event.options as import("../shared/types/acp.js").SessionConfigOption[]);
+		stateManager.setConfigOptions(
+			event.options as import("../shared/types/acp.js").SessionConfigOption[],
+		);
 		bridge.postMessage({
 			type: "session_update",
 			sessionId: event.sessionId,
+			// biome-ignore format: inline import type assertion cannot be split across lines
 			update: { sessionUpdate: "config_option_update", configOptions: event.options } as import("../shared/types/acp.js").SessionUpdate,
 		});
 	});
 
-	registerCommands(context, { registry, state: stateManager, bridge, context, sidebarProvider, configManager });
+	registerCommands(context, {
+		registry,
+		state: stateManager,
+		bridge,
+		context,
+		sidebarProvider,
+		configManager,
+	});
 
 	context.subscriptions.push(stateManager, configManager, bridge, statusBar);
 }

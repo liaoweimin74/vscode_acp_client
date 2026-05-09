@@ -46,3 +46,5 @@ export const selNewSession = (s: S) => s.newSession;
 export const selSessionMenuOpen = (s: S) => s.sessionMenuOpen;
 export const selCloseSessionMenu = (s: S) => s.closeSessionMenu;
 export const selLocale = (s: S) => s.locale;
+export const selMcpServers = (s: S) => s.mcpServers;
+export const selToggleMcpServer = (s: S) => s.toggleMcpServer;

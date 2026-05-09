@@ -3,6 +3,7 @@ import type {
 	AgentRole,
 	ExtensionState,
 	FileAttachment,
+	McpServerEntry,
 	Message,
 	SessionConfigOption,
 	SessionSummary,
@@ -22,8 +23,9 @@ interface UIState {
 	activeRole: string | null;
 	reconnectFailed: boolean;
 	slashCommands: { name: string; description: string }[];
-	commandPopup: "sessions" | "models" | null;
+	commandPopup: "sessions" | "models" | "mcps" | null;
 	sessionMenuOpen: boolean;
+	mcpServers: McpServerEntry[];
 
 	messages: Map<string, Message[]>;
 	isStreaming: boolean;
@@ -50,8 +52,9 @@ interface UIState {
 	deleteSession(sessionId: string): void;
 	cancelPrompt(): void;
 	reconnectAgent(): void;
-	openCommandPopup(popup: "sessions" | "models"): void;
+	openCommandPopup(popup: "sessions" | "models" | "mcps"): void;
 	closeCommandPopup(): void;
+	toggleMcpServer(name: string, enabled: boolean): void;
 	removeQueuedPrompt(index: number): void;
 	sendQueuedPromptNow(index: number): void;
 	openSessionMenu(): void;
@@ -62,7 +65,12 @@ interface UIState {
 	addAttachments(attachments: FileAttachment[]): void;
 	removeAttachment(index: number): void;
 	clearAttachments(): void;
-	addPastedSnippet(snippet: { id: string; preview: string; fullText: string; charCount: number }): void;
+	addPastedSnippet(snippet: {
+		id: string;
+		preview: string;
+		fullText: string;
+		charCount: number;
+	}): void;
 	removePastedSnippet(index: number): void;
 	setMentionMenuOpen(open: boolean): void;
 }
@@ -94,6 +102,7 @@ export const useStore = create<UIState>((set, get) => {
 				const incomingConfig = msg.state.configOptions ?? [];
 				const incomingRoles = msg.state.agentRoles ?? [];
 				const currentAgents = get().agents;
+				// biome-ignore lint/suspicious/noExplicitAny: incoming agent shape from protocol may not match UI type exactly
 				const mergedAgents = (msg.state.agents ?? []).map((incoming: any) => {
 					const current = currentAgents.find((a) => a.config.id === incoming.config.id);
 					if (current?.status === "connecting" && incoming.status === "connecting") {
@@ -122,13 +131,13 @@ export const useStore = create<UIState>((set, get) => {
 					activeRole: msg.activeRole ?? null,
 				});
 				break;
-		case "session_messages":
-			set((state) => {
-				const messages = new Map(state.messages);
-				messages.set(msg.sessionId, msg.messages);
-				return { messages };
-			});
-			break;
+			case "session_messages":
+				set((state) => {
+					const messages = new Map(state.messages);
+					messages.set(msg.sessionId, msg.messages);
+					return { messages };
+				});
+				break;
 			case "stream_start":
 				set({ isStreaming: true });
 				break;
@@ -204,7 +213,7 @@ export const useStore = create<UIState>((set, get) => {
 					if (newTitle) {
 						set((state) => ({
 							sessions: state.sessions.map((s) =>
-								s.id === msg.sessionId ? { ...s, title: newTitle } : s
+								s.id === msg.sessionId ? { ...s, title: newTitle } : s,
 							),
 						}));
 					}
@@ -219,7 +228,10 @@ export const useStore = create<UIState>((set, get) => {
 				set({ reconnectFailed: true });
 				break;
 			case "open_command_popup":
-				set({ commandPopup: msg.popup as "sessions" | "models" });
+				set({ commandPopup: msg.popup as "sessions" | "models" | "mcps" });
+				break;
+			case "mcp_servers_update":
+				set({ mcpServers: msg.servers as McpServerEntry[] });
 				break;
 			case "file_dialog_result":
 				if (msg.files && msg.files.length > 0) {
@@ -244,6 +256,7 @@ export const useStore = create<UIState>((set, get) => {
 		slashCommands: [],
 		commandPopup: null,
 		sessionMenuOpen: false,
+		mcpServers: [],
 		messages: restoreMessages(),
 		isStreaming: false,
 		queuedPrompts: [],
@@ -292,15 +305,21 @@ export const useStore = create<UIState>((set, get) => {
 
 		sendMessage(prompt: string) {
 			const { activeSession, isStreaming, queuedPrompts, attachments, pastedSnippets } = get();
-			const fullPrompt = pastedSnippets.length > 0
-				? prompt + "\n<clipboard>\n" + pastedSnippets.map((s) => s.fullText).join("\n") + "\n</clipboard>"
-				: prompt;
+			const fullPrompt =
+				pastedSnippets.length > 0
+					? `${prompt}\n<clipboard>\n${pastedSnippets.map((s) => s.fullText).join("\n")}\n</clipboard>`
+					: prompt;
 			if (isStreaming) {
 				set({ queuedPrompts: [...queuedPrompts, fullPrompt], inputText: "", pastedSnippets: [] });
 				return;
 			}
 			const sessionId = activeSession ?? "";
-			postMessage({ type: "send_prompt", sessionId, prompt: fullPrompt, attachments: attachments.length > 0 ? attachments : undefined });
+			postMessage({
+				type: "send_prompt",
+				sessionId,
+				prompt: fullPrompt,
+				attachments: attachments.length > 0 ? attachments : undefined,
+			});
 			set({ inputText: "", isStreaming: true, attachments: [], pastedSnippets: [] });
 		},
 
@@ -391,12 +410,19 @@ export const useStore = create<UIState>((set, get) => {
 			set({ reconnectFailed: false });
 		},
 
-		openCommandPopup(popup: "sessions" | "models") {
+		openCommandPopup(popup: "sessions" | "models" | "mcps") {
 			set({ commandPopup: popup, isCommandMenuOpen: false });
 		},
 
 		closeCommandPopup() {
 			set({ commandPopup: null });
+		},
+
+		toggleMcpServer(name: string, enabled: boolean) {
+			set((state) => ({
+				mcpServers: state.mcpServers.map((s) => (s.name === name ? { ...s, enabled } : s)),
+			}));
+			postMessage({ type: "toggle_mcp_server", name, enabled });
 		},
 
 		openSessionMenu() {
@@ -464,7 +490,12 @@ export const useStore = create<UIState>((set, get) => {
 			set({ attachments: [] });
 		},
 
-		addPastedSnippet(snippet: { id: string; preview: string; fullText: string; charCount: number }) {
+		addPastedSnippet(snippet: {
+			id: string;
+			preview: string;
+			fullText: string;
+			charCount: number;
+		}) {
 			set((state) => ({
 				pastedSnippets: [...state.pastedSnippets, snippet],
 			}));

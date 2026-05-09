@@ -1,8 +1,8 @@
 {
-  "name": "vscode-acp",
+  "name": "vscode-acp-client",
   "displayName": "%displayName%",
   "description": "%description%",
-  "version": "v1.0.0-alpha.1",
+  "version": "1.0.0",
   "publisher": "foxweimin",
   "license": "MIT",
   "engines": {
@@ -161,6 +161,53 @@
           ],
           "default": "info",
           "description": "%configuration.logLevel.description%"
+        },
+        "vscodeAcp.mcpServers": {
+          "type": "array",
+          "default": [],
+          "description": "%configuration.mcpServers.description%",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "%configuration.mcpServers.name.description%"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "http",
+                  "sse",
+                  "stdio"
+                ],
+                "description": "%configuration.mcpServers.type.description%"
+              },
+              "url": {
+                "type": "string",
+                "description": "%configuration.mcpServers.url.description%"
+              },
+              "command": {
+                "type": "string",
+                "description": "%configuration.mcpServers.command.description%"
+              },
+              "args": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "%configuration.mcpServers.args.description%"
+              },
+              "enabled": {
+                "type": "boolean",
+                "default": true,
+                "description": "%configuration.mcpServers.enabled.description%"
+              }
+            },
+            "required": [
+              "name",
+              "type"
+            ]
+          }
         }
       }
     }
